@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Quiz Master - Test Page</h1>
+
+    <div id="test-results"></div>
+
+    <button onclick="runTests()">Run Tests</button>
+    <button onclick="location.href='index.html'">Go to Main App</button>
+
+    <script src="data/questions.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/game-logic.js"></script>
+    <script src="js/ui-manager.js"></script>
+
+    <script>
+        function logResult(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = message;
+            document.getElementById('test-results').appendChild(div);
+        }
+
+        function runTests() {
+            document.getElementById('test-results').innerHTML = '';
+
+            try {
+                // Test 1: Check if QUIZ_DATABASE is loaded
+                if (typeof QUIZ_DATABASE !== 'undefined') {
+                    logResult('✅ Questions database loaded successfully');
+                    logResult(`📊 Found ${Object.keys(QUIZ_DATABASE).length} sections`);
+                } else {
+                    logResult('❌ Questions database not found', false);
+                }
+
+                // Test 2: Check if DataManager is initialized
+                if (typeof dataManager !== 'undefined') {
+                    logResult('✅ Data Manager initialized');
+                    logResult(`💾 User progress loaded: ${dataManager.userProgress.totalScore} points`);
+                } else {
+                    logResult('❌ Data Manager not found', false);
+                }
+
+                // Test 3: Check if GameLogic is initialized
+                if (typeof gameLogic !== 'undefined') {
+                    logResult('✅ Game Logic initialized');
+                } else {
+                    logResult('❌ Game Logic not found', false);
+                }
+
+                // Test 4: Test loading questions
+                if (typeof dataManager !== 'undefined') {
+                    const questions = dataManager.loadQuestions('science', 1);
+                    if (questions && questions.length > 0) {
+                        logResult(`✅ Science Level 1: ${questions.length} questions loaded`);
+                    } else {
+                        logResult('❌ Failed to load questions', false);
+                    }
+                }
+
+                // Test 5: Test localStorage
+                try {
+                    localStorage.setItem('test', 'value');
+                    localStorage.removeItem('test');
+                    logResult('✅ Local storage working');
+                } catch (e) {
+                    logResult('⚠️ Local storage not available', false);
+                }
+
+                // Test 6: Check sections
+                const sections = ['science', 'history', 'sports', 'literature', 'general'];
+                sections.forEach(section => {
+                    if (QUIZ_DATABASE[section]) {
+                        logResult(`✅ ${QUIZ_DATABASE[section].name} section loaded`);
+                    } else {
+                        logResult(`❌ ${section} section missing`, false);
+                    }
+                });
+
+                logResult('🎉 All tests completed!');
+
+            } catch (error) {
+                logResult(`❌ Test error: ${error.message}`, false);
+                console.error('Test error:', error);
+            }
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

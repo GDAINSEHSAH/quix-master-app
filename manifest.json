@@ -1,0 +1,144 @@
+{
+  "name": "Quiz Master - Ultimate Knowledge Challenge",
+  "short_name": "Quiz Master",
+  "description": "Test your knowledge across 5 amazing categories with 1000+ questions each. Progressive difficulty levels, achievements, and cross-platform compatibility.",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#667eea",
+  "background_color": "#f7fafc",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["education", "games", "entertainment"],
+  "icons": [
+    {
+      "src": "assets/images/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/images/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/images/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/images/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/images/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/images/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/images/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Quiz Master main menu with category selection"
+    },
+    {
+      "src": "assets/images/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Quiz Master mobile view with question interface"
+    }
+  ],
+  "features": [
+    "Cross Platform Compatible",
+    "5 Knowledge Categories",
+    "1000+ Questions per Category",
+    "Progressive Difficulty System",
+    "Achievement System",
+    "Offline Capable",
+    "Responsive Design",
+    "Sound Effects",
+    "Keyboard Navigation"
+  ],
+  "shortcuts": [
+    {
+      "name": "Science & Technology",
+      "short_name": "Science",
+      "description": "Start Science & Technology quiz",
+      "url": "/index.html?section=science",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-science.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "History & Geography",
+      "short_name": "History",
+      "description": "Start History & Geography quiz",
+      "url": "/index.html?section=history",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-history.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Sports & Entertainment",
+      "short_name": "Sports",
+      "description": "Start Sports & Entertainment quiz",
+      "url": "/index.html?section=sports",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-sports.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [],
+  "file_handlers": [],
+  "permissions": [
+    "storage"
+  ],
+  "offline_enabled": true
+}

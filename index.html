@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Ultimate Knowledge Challenge</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#667eea">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="screen active">
+            <div class="loading-content">
+                <div class="logo">
+                    <h1 class="game-title">Quiz Master</h1>
+                    <p class="game-subtitle">Ultimate Knowledge Challenge</p>
+                </div>
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading amazing questions...</p>
+            </div>
+        </div>
+
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen">
+            <div class="menu-header">
+                <h1 class="game-title">Quiz Master</h1>
+                <p class="game-subtitle">Test Your Knowledge Across 5 Amazing Categories</p>
+            </div>
+
+            <div class="menu-content">
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Score</span>
+                        <span class="stat-value" id="total-score">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Levels Completed</span>
+                        <span class="stat-value" id="levels-completed">0</span>
+                    </div>
+                </div>
+
+                <div class="sections-grid">
+                    <div class="section-card" data-section="science">
+                        <div class="section-icon">🔬</div>
+                        <h3>Science & Technology</h3>
+                        <p>Explore the wonders of science and technology</p>
+                        <div class="section-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-text">0/10 Levels</span>
+                        </div>
+                    </div>
+
+                    <div class="section-card" data-section="history">
+                        <div class="section-icon">🏛️</div>
+                        <h3>History & Geography</h3>
+                        <p>Journey through time and explore the world</p>
+                        <div class="section-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-text">0/10 Levels</span>
+                        </div>
+                    </div>
+
+                    <div class="section-card" data-section="sports">
+                        <div class="section-icon">⚽</div>
+                        <h3>Sports & Entertainment</h3>
+                        <p>Challenge your sports and entertainment knowledge</p>
+                        <div class="section-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-text">0/10 Levels</span>
+                        </div>
+                    </div>
+
+                    <div class="section-card" data-section="literature">
+                        <div class="section-icon">📚</div>
+                        <h3>Literature & Arts</h3>
+                        <p>Dive into the world of books and creativity</p>
+                        <div class="section-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-text">0/10 Levels</span>
+                        </div>
+                    </div>
+
+                    <div class="section-card" data-section="general">
+                        <div class="section-icon">🧠</div>
+                        <h3>General Knowledge</h3>
+                        <p>Test your overall knowledge and trivia skills</p>
+                        <div class="section-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-text">0/10 Levels</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-buttons">
+                    <button class="btn btn-secondary" id="settings-btn">⚙️ Settings</button>
+                    <button class="btn btn-secondary" id="achievements-btn">🏆 Achievements</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Selection -->
+        <div id="level-selection" class="screen">
+            <div class="screen-header">
+                <button class="btn btn-back" id="back-to-menu">← Back</button>
+                <h2 id="section-title">Section Name</h2>
+            </div>
+
+            <div class="levels-grid" id="levels-grid">
+                <!-- Levels will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Quiz Game -->
+        <div id="quiz-game" class="screen">
+            <div class="quiz-header">
+                <button class="btn btn-back" id="back-to-levels">← Back</button>
+                <div class="quiz-info">
+                    <div class="quiz-level">Level <span id="current-level">1</span></div>
+                    <div class="quiz-score">Score: <span id="current-score">0</span></div>
+                </div>
+                <div class="quiz-timer">
+                    <div class="timer-circle">
+                        <span id="timer-display">30</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-content">
+                <div class="question-counter">
+                    Question <span id="question-number">1</span> of <span id="total-questions">10</span>
+                </div>
+
+                <div class="question-container">
+                    <h3 id="question-text">Loading question...</h3>
+                </div>
+
+                <div class="answers-container" id="answers-container">
+                    <!-- Answer options will be dynamically generated -->
+                </div>
+
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" id="next-question" style="display: none;">Next Question</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <div class="results-content">
+                <div class="results-header">
+                    <div class="results-icon" id="results-icon">🎉</div>
+                    <h2 id="results-title">Level Complete!</h2>
+                </div>
+
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="correct-answers">8</div>
+                        <div class="stat-label">Correct Answers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="final-score">800</div>
+                        <div class="stat-label">Score Earned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="accuracy">80%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="results-message" id="results-message">
+                    Great job! You've unlocked the next level!
+                </div>
+
+                <div class="results-buttons">
+                    <button class="btn btn-primary" id="next-level-btn">Next Level</button>
+                    <button class="btn btn-secondary" id="retry-level-btn">Retry Level</button>
+                    <button class="btn btn-secondary" id="back-to-section">Back to Section</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/questions.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/game-logic.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
