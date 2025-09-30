@@ -32,53 +32,53 @@ class UIManager {
             card.addEventListener('click', (e) => {
                 const section = card.dataset.section;
                 this.showLevelSelection(section);
-                soundManager.play('click');
+                // Click sound removed for better UX
             });
         });
 
         // Navigation buttons
         document.getElementById('back-to-menu').addEventListener('click', () => {
             this.showScreen('mainMenu');
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         document.getElementById('back-to-levels').addEventListener('click', () => {
             gameLogic.endGame();
             this.showLevelSelection(gameLogic.currentSection);
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         // Settings and achievements buttons
         document.getElementById('settings-btn').addEventListener('click', () => {
             this.showSettings();
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         document.getElementById('achievements-btn').addEventListener('click', () => {
             this.showAchievements();
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         // Quiz controls
         document.getElementById('next-question').addEventListener('click', () => {
             this.handleNextQuestion();
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         // Results screen buttons
         document.getElementById('next-level-btn').addEventListener('click', () => {
             this.handleNextLevel();
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         document.getElementById('retry-level-btn').addEventListener('click', () => {
             this.handleRetryLevel();
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         document.getElementById('back-to-section').addEventListener('click', () => {
             this.showLevelSelection(gameLogic.currentSection);
-            soundManager.play('click');
+            // Click sound removed for better UX
         });
 
         // Keyboard navigation
@@ -148,7 +148,7 @@ class UIManager {
             if (isUnlocked) {
                 levelCard.addEventListener('click', () => {
                     this.startQuiz(sectionId, level);
-                    soundManager.play('click');
+                    // Click sound removed for better UX
                 });
             }
 
@@ -255,8 +255,10 @@ class UIManager {
         // Update score display
         document.getElementById('current-score').textContent = result.totalScore;
 
-        // Play sound effect
-        soundManager.play(result.isCorrect ? 'correct' : 'incorrect');
+        // Play sound effect using working AudioManager
+        if (window.audioManager) {
+            window.audioManager.playAnswerFeedback(result.isCorrect);
+        }
 
         // Show next button or complete quiz
         if (!gameLogic.isQuizComplete()) {
@@ -323,7 +325,9 @@ class UIManager {
 
     // Handle timeout
     handleTimeout() {
-        soundManager.play('incorrect');
+        if (window.audioManager) {
+            window.audioManager.playWrong();
+        }
         this.selectAnswer(-1); // Mark as timeout
     }
 
@@ -336,7 +340,7 @@ class UIManager {
         const timerCircle = document.querySelector('.timer-circle');
         if (timeRemaining <= 5) {
             timerCircle.style.background = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)';
-            soundManager.play('tick');
+            // Tick sound removed for better UX
         } else if (timeRemaining <= 10) {
             timerCircle.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
         } else {
@@ -390,7 +394,9 @@ class UIManager {
         this.showScreen('results');
 
         // Play completion sound
-        soundManager.play('complete');
+        if (window.audioManager) {
+            window.audioManager.playAchievement();
+        }
     }
 
     // Handle next level
