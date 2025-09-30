@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Comprehensive Test Suite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .user-simulation {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .test-controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 Quiz Master - Comprehensive Test Suite</h1>
+        <p>Multi-User Simulation & Performance Testing</p>
+    </div>
+
+    <div class="test-controls">
+        <h3>🎮 Test Controls</h3>
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <button onclick="simulateMultipleUsers()">👥 Simulate Multiple Users (10)</button>
+        <button onclick="stressTest()">⚡ Stress Test (100 Users)</button>
+        <button onclick="crossPlatformTest()">📱 Cross-Platform Test</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="overall-progress"></div>
+        </div>
+        <div id="progress-text">Ready to start testing...</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="total-tests">0</div>
+            <div class="stat-label">Total Tests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="passed-tests">0</div>
+            <div class="stat-label">Passed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="failed-tests">0</div>
+            <div class="stat-label">Failed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="avg-response-time">0ms</div>
+            <div class="stat-label">Avg Response Time</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Test Results</h3>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>👥 User Simulations</h3>
+        <div id="user-simulations"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📈 Performance Metrics</h3>
+        <div id="performance-metrics"></div>
+    </div>
+
+    <script src="data/questions.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/game-logic.js"></script>
+
+    <script>
+        class QuizTestSuite {
+            constructor() {
+                this.testResults = [];
+                this.userSimulations = [];
+                this.performanceMetrics = [];
+                this.totalTests = 0;
+                this.passedTests = 0;
+                this.failedTests = 0;
+                this.responseTimes = [];
+            }
+
+            logResult(test, result, details = '', type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const testResult = {
+                    test,
+                    result,
+                    details,
+                    type,
+                    timestamp
+                };
+
+                this.testResults.push(testResult);
+                this.totalTests++;
+
+                if (result.includes('✅') || result.includes('PASS')) {
+                    this.passedTests++;
+                    type = 'success';
+                } else if (result.includes('❌') || result.includes('FAIL')) {
+                    this.failedTests++;
+                    type = 'error';
+                } else if (result.includes('⚠️') || result.includes('WARN')) {
+                    type = 'warning';
+                }
+
+                this.displayResult(test, result, details, type, timestamp);
+                this.updateStats();
+            }
+
+            displayResult(test, result, details, type, timestamp) {
+                const div = document.createElement('div');
+                div.className = `test-result ${type}`;
+                div.innerHTML = `
+                    <strong>[${timestamp}] ${test}</strong><br>
+                    ${result}<br>
+                    ${details ? `<small>${details}</small>` : ''}
+                `;
+                document.getElementById('test-results').appendChild(div);
+                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            updateStats() {
+                document.getElementById('total-tests').textContent = this.totalTests;
+                document.getElementById('passed-tests').textContent = this.passedTests;
+                document.getElementById('failed-tests').textContent = this.failedTests;
+
+                if (this.responseTimes.length > 0) {
+                    const avgTime = Math.round(this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length);
+                    document.getElementById('avg-response-time').textContent = `${avgTime}ms`;
+                }
+            }
+
+            updateProgress(percentage, text) {
+                document.getElementById('overall-progress').style.width = `${percentage}%`;
+                document.getElementById('progress-text').textContent = text;
+            }
+
+            // Test 1: Database Loading
+            async testDatabaseLoading() {
+                const startTime = performance.now();
+
+                try {
+                    if (typeof QUIZ_DATABASE === 'undefined') {
+                        throw new Error('QUIZ_DATABASE not loaded');
+                    }
+
+                    const sections = Object.keys(QUIZ_DATABASE);
+                    if (sections.length !== 5) {
+                        throw new Error(`Expected 5 sections, found ${sections.length}`);
+                    }
+
+                    const expectedSections = ['science', 'history', 'sports', 'literature', 'general'];
+                    for (const section of expectedSections) {
+                        if (!QUIZ_DATABASE[section]) {
+                            throw new Error(`Missing section: ${section}`);
+                        }
+
+                        if (!QUIZ_DATABASE[section].levels) {
+                            throw new Error(`Section ${section} missing levels`);
+                        }
+                    }
+
+                    const endTime = performance.now();
+                    this.responseTimes.push(endTime - startTime);
+
+                    this.logResult(
+                        'Database Loading',
+                        '✅ PASS - All sections loaded correctly',
+                        `Found ${sections.length} sections: ${sections.join(', ')}`,
+                        'success'
+                    );
+
+                } catch (error) {
+                    this.logResult(
+                        'Database Loading',
+                        '❌ FAIL - Database loading error',
+                        error.message,
+                        'error'
+                    );
+                }
+            }
+
+            // Test 2: Question Loading for All Sections
+            async testQuestionLoading() {
+                const sections = ['science', 'history', 'sports', 'literature', 'general'];
+
+                for (const section of sections) {
+                    for (let level = 1; level <= 3; level++) {
+                        const startTime = performance.now();
+
+                        try {
+                            const questions = await dataManager.loadQuestions(section, level);
+                            const endTime = performance.now();
+                            this.responseTimes.push(endTime - startTime);
+
+                            if (questions.length === 0) {
+                                this.logResult(
+                                    `Question Loading - ${section} Level ${level}`,
+                                    '⚠️ WARN - No questions loaded',
+                                    'This may cause game issues',
+                                    'warning'
+                                );
+                            } else {
+                                // Check for duplicate questions
+                                const questionTexts = questions.map(q => q.question);
+                                const uniqueQuestions = new Set(questionTexts);
+
+                                if (uniqueQuestions.size !== questionTexts.length) {
+                                    this.logResult(
+                                        `Question Loading - ${section} Level ${level}`,
+                                        '⚠️ WARN - Duplicate questions detected',
+                                        `${questionTexts.length - uniqueQuestions.size} duplicates found`,
+                                        'warning'
+                                    );
+                                } else {
+                                    this.logResult(
+                                        `Question Loading - ${section} Level ${level}`,
+                                        '✅ PASS - Questions loaded successfully',
+                                        `${questions.length} unique questions loaded`,
+                                        'success'
+                                    );
+                                }
+                            }
+
+                        } catch (error) {
+                            this.logResult(
+                                `Question Loading - ${section} Level ${level}`,
+                                '❌ FAIL - Question loading error',
+                                error.message,
+                                'error'
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Test 3: Game Logic Simulation
+            async testGameLogic() {
+                try {
+                    // Initialize a game session
+                    const gameData = await gameLogic.initializeQuiz('science', 1);
+
+                    if (!gameData.firstQuestion) {
+                        throw new Error('Failed to get first question');
+                    }
+
+                    this.logResult(
+                        'Game Logic - Initialization',
+                        '✅ PASS - Game initialized successfully',
+                        `Total questions: ${gameData.totalQuestions}`,
+                        'success'
+                    );
+
+                    // Test scoring system
+                    gameLogic.timeRemaining = 25; // Simulate 25 seconds remaining
+                    const score = gameLogic.calculateScore();
+
+                    if (score > 0) {
+                        this.logResult(
+                            'Game Logic - Scoring',
+                            '✅ PASS - Scoring system working',
+                            `Generated score: ${score} points`,
+                            'success'
+                        );
+                    } else {
+                        this.logResult(
+                            'Game Logic - Scoring',
+                            '❌ FAIL - Invalid score generated',
+                            `Score: ${score}`,
+                            'error'
+                        );
+                    }
+
+                    // Test answer submission
+                    const result = gameLogic.submitAnswer(0);
+                    if (result) {
+                        this.logResult(
+                            'Game Logic - Answer Submission',
+                            '✅ PASS - Answer submission working',
+                            `Answer result: ${result.isCorrect ? 'Correct' : 'Incorrect'}`,
+                            'success'
+                        );
+                    } else {
+                        this.logResult(
+                            'Game Logic - Answer Submission',
+                            '❌ FAIL - Answer submission failed',
+                            'No result returned',
+                            'error'
+                        );
+                    }
+
+                } catch (error) {
+                    this.logResult(
+                        'Game Logic',
+                        '❌ FAIL - Game logic error',
+                        error.message,
+                        'error'
+                    );
+                }
+            }
+
+            // Test 4: User Progress System
+            async testUserProgress() {
+                try {
+                    // Test progress saving
+                    const originalProgress = dataManager.userProgress.totalScore;
+                    dataManager.userProgress.totalScore = 999;
+                    dataManager.saveProgress();
+
+                    // Test progress loading
+                    const newDataManager = new DataManager();
+
+                    if (newDataManager.userProgress.totalScore === 999) {
+                        this.logResult(
+                            'User Progress - Save/Load',
+                            '✅ PASS - Progress persistence working',
+                            'Score correctly saved and loaded',
+                            'success'
+                        );
+                    } else {
+                        this.logResult(
+                            'User Progress - Save/Load',
+                            '❌ FAIL - Progress persistence failed',
+                            `Expected 999, got ${newDataManager.userProgress.totalScore}`,
+                            'error'
+                        );
+                    }
+
+                    // Restore original progress
+                    dataManager.userProgress.totalScore = originalProgress;
+                    dataManager.saveProgress();
+
+                    // Test level unlocking
+                    const isLevel1Unlocked = dataManager.isLevelUnlocked('science', 1);
+                    const isLevel10Unlocked = dataManager.isLevelUnlocked('science', 10);
+
+                    if (isLevel1Unlocked && !isLevel10Unlocked) {
+                        this.logResult(
+                            'User Progress - Level Unlocking',
+                            '✅ PASS - Level unlocking logic working',
+                            'Level 1 unlocked, Level 10 locked as expected',
+                            'success'
+                        );
+                    } else {
+                        this.logResult(
+                            'User Progress - Level Unlocking',
+                            '⚠️ WARN - Level unlocking may need review',
+                            `L1: ${isLevel1Unlocked}, L10: ${isLevel10Unlocked}`,
+                            'warning'
+                        );
+                    }
+
+                } catch (error) {
+                    this.logResult(
+                        'User Progress',
+                        '❌ FAIL - Progress system error',
+                        error.message,
+                        'error'
+                    );
+                }
+            }
+
+            // Test 5: Cross-Platform Compatibility
+            async testCrossPlatform() {
+                const userAgent = navigator.userAgent;
+                const platform = navigator.platform;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+                const isTablet = /(iPad|Android(?!.*Mobile))/i.test(userAgent);
+
+                this.logResult(
+                    'Cross-Platform - Device Detection',
+                    '✅ PASS - Device information gathered',
+                    `Platform: ${platform}, Mobile: ${isMobile}, Tablet: ${isTablet}`,
+                    'info'
+                );
+
+                // Test localStorage availability
+                try {
+                    localStorage.setItem('test-key', 'test-value');
+                    const retrieved = localStorage.getItem('test-key');
+                    localStorage.removeItem('test-key');
+
+                    if (retrieved === 'test-value') {
+                        this.logResult(
+                            'Cross-Platform - Local Storage',
+                            '✅ PASS - Local storage working',
+                            'Storage read/write successful',
+                            'success'
+                        );
+                    } else {
+                        this.logResult(
+                            'Cross-Platform - Local Storage',
+                            '❌ FAIL - Local storage not working',
+                            'Storage read/write failed',
+                            'error'
+                        );
+                    }
+                } catch (error) {
+                    this.logResult(
+                        'Cross-Platform - Local Storage',
+                        '❌ FAIL - Local storage unavailable',
+                        error.message,
+                        'error'
+                    );
+                }
+
+                // Test screen size compatibility
+                const screenInfo = {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    ratio: window.devicePixelRatio || 1
+                };
+
+                this.logResult(
+                    'Cross-Platform - Screen Compatibility',
+                    '✅ PASS - Screen information gathered',
+                    `${screenInfo.width}x${screenInfo.height}, Ratio: ${screenInfo.ratio}`,
+                    'info'
+                );
+            }
+
+            // Test 6: Performance Under Load
+            async testPerformanceLoad() {
+                const iterations = 100;
+                const startTime = performance.now();
+
+                for (let i = 0; i < iterations; i++) {
+                    try {
+                        await dataManager.loadQuestions('science', 1);
+                        const score = gameLogic.calculateScore();
+                        dataManager.saveProgress();
+                    } catch (error) {
+                        this.logResult(
+                            'Performance Load',
+                            '❌ FAIL - Error during load test',
+                            `Iteration ${i}: ${error.message}`,
+                            'error'
+                        );
+                        return;
+                    }
+                }
+
+                const endTime = performance.now();
+                const totalTime = endTime - startTime;
+                const avgTime = totalTime / iterations;
+
+                this.responseTimes.push(avgTime);
+
+                if (avgTime < 10) {
+                    this.logResult(
+                        'Performance Load',
+                        '✅ PASS - Excellent performance',
+                        `${iterations} operations in ${totalTime.toFixed(2)}ms (avg: ${avgTime.toFixed(2)}ms)`,
+                        'success'
+                    );
+                } else if (avgTime < 50) {
+                    this.logResult(
+                        'Performance Load',
+                        '✅ PASS - Good performance',
+                        `${iterations} operations in ${totalTime.toFixed(2)}ms (avg: ${avgTime.toFixed(2)}ms)`,
+                        'success'
+                    );
+                } else {
+                    this.logResult(
+                        'Performance Load',
+                        '⚠️ WARN - Slow performance',
+                        `${iterations} operations in ${totalTime.toFixed(2)}ms (avg: ${avgTime.toFixed(2)}ms)`,
+                        'warning'
+                    );
+                }
+            }
+
+            // Test 7: Edge Cases
+            async testEdgeCases() {
+                // Test invalid section
+                try {
+                    const questions = await dataManager.loadQuestions('invalid-section', 1);
+                    if (questions.length === 0) {
+                        this.logResult(
+                            'Edge Cases - Invalid Section',
+                            '✅ PASS - Handled invalid section gracefully',
+                            'Returned empty array as expected',
+                            'success'
+                        );
+                    } else {
+                        this.logResult(
+                            'Edge Cases - Invalid Section',
+                            '⚠️ WARN - Unexpected behavior with invalid section',
+                            `Returned ${questions.length} questions`,
+                            'warning'
+                        );
+                    }
+                } catch (error) {
+                    this.logResult(
+                        'Edge Cases - Invalid Section',
+                        '❌ FAIL - Error with invalid section',
+                        error.message,
+                        'error'
+                    );
+                }
+
+                // Test invalid level
+                try {
+                    const questions = await dataManager.loadQuestions('science', 999);
+                    this.logResult(
+                        'Edge Cases - Invalid Level',
+                        '✅ PASS - Handled invalid level',
+                        `Returned ${questions.length} questions (fallback)`,
+                        'success'
+                    );
+                } catch (error) {
+                    this.logResult(
+                        'Edge Cases - Invalid Level',
+                        '❌ FAIL - Error with invalid level',
+                        error.message,
+                        'error'
+                    );
+                }
+
+                // Test timer edge cases
+                gameLogic.timeRemaining = 0;
+                const zeroTimeScore = gameLogic.calculateScore();
+                if (zeroTimeScore >= 10) {
+                    this.logResult(
+                        'Edge Cases - Zero Time Score',
+                        '✅ PASS - Minimum score maintained',
+                        `Score: ${zeroTimeScore}`,
+                        'success'
+                    );
+                } else {
+                    this.logResult(
+                        'Edge Cases - Zero Time Score',
+                        '❌ FAIL - Score too low',
+                        `Score: ${zeroTimeScore}`,
+                        'error'
+                    );
+                }
+            }
+
+            // Simulate Multiple Users
+            async simulateUsers(userCount) {
+                this.logResult(
+                    'User Simulation',
+                    `🚀 Starting simulation with ${userCount} users`,
+                    'Each user will play through a complete quiz',
+                    'info'
+                );
+
+                const userPromises = [];
+
+                for (let i = 1; i <= userCount; i++) {
+                    userPromises.push(this.simulateUser(i));
+                }
+
+                const results = await Promise.all(userPromises);
+
+                const successfulUsers = results.filter(r => r.success).length;
+                const avgScore = results.reduce((sum, r) => sum + r.score, 0) / results.length;
+
+                this.logResult(
+                    'User Simulation Results',
+                    `✅ Simulation completed`,
+                    `${successfulUsers}/${userCount} users successful. Avg score: ${avgScore.toFixed(0)}`,
+                    successfulUsers === userCount ? 'success' : 'warning'
+                );
+            }
+
+            async simulateUser(userId) {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user-simulation';
+                userDiv.innerHTML = `
+                    <strong>👤 User ${userId}</strong> - Starting quiz...
+                `;
+                document.getElementById('user-simulations').appendChild(userDiv);
+
+                try {
+                    // Random section and level
+                    const sections = ['science', 'history', 'sports', 'literature', 'general'];
+                    const section = sections[Math.floor(Math.random() * sections.length)];
+                    const level = Math.floor(Math.random() * 3) + 1;
+
+                    userDiv.innerHTML += `<br>📚 Playing ${section} level ${level}`;
+
+                    // Initialize game
+                    await gameLogic.initializeQuiz(section, level);
+
+                    let totalScore = 0;
+                    let correctAnswers = 0;
+
+                    // Simulate answering 10 questions
+                    for (let q = 0; q < 10; q++) {
+                        const currentQuestion = gameLogic.getCurrentQuestion();
+                        if (!currentQuestion) break;
+
+                        // Simulate random answer time (5-30 seconds)
+                        gameLogic.timeRemaining = Math.floor(Math.random() * 25) + 5;
+
+                        // Simulate answer (70% chance of correct answer)
+                        const isCorrect = Math.random() < 0.7;
+                        const answerIndex = isCorrect ?
+                            gameLogic.currentQuestions[gameLogic.currentQuestionIndex].correct :
+                            Math.floor(Math.random() * 4);
+
+                        const result = gameLogic.submitAnswer(answerIndex);
+
+                        if (result && result.isCorrect) {
+                            correctAnswers++;
+                            totalScore += result.scoreEarned;
+                        }
+
+                        gameLogic.nextQuestion();
+                    }
+
+                    userDiv.innerHTML += `<br>✅ Completed! Score: ${totalScore}, Correct: ${correctAnswers}/10`;
+
+                    return {
+                        success: true,
+                        userId,
+                        section,
+                        level,
+                        score: totalScore,
+                        correct: correctAnswers
+                    };
+
+                } catch (error) {
+                    userDiv.innerHTML += `<br>❌ Error: ${error.message}`;
+                    return {
+                        success: false,
+                        userId,
+                        score: 0,
+                        error: error.message
+                    };
+                }
+            }
+
+            // Run all tests
+            async runAllTests() {
+                this.clearResults();
+
+                const tests = [
+                    { name: 'Database Loading', func: () => this.testDatabaseLoading() },
+                    { name: 'Question Loading', func: () => this.testQuestionLoading() },
+                    { name: 'Game Logic', func: () => this.testGameLogic() },
+                    { name: 'User Progress', func: () => this.testUserProgress() },
+                    { name: 'Cross-Platform', func: () => this.testCrossPlatform() },
+                    { name: 'Performance Load', func: () => this.testPerformanceLoad() },
+                    { name: 'Edge Cases', func: () => this.testEdgeCases() }
+                ];
+
+                for (let i = 0; i < tests.length; i++) {
+                    const test = tests[i];
+                    this.updateProgress((i / tests.length) * 100, `Running ${test.name}...`);
+
+                    await test.func();
+                    await this.sleep(500); // Small delay between tests
+                }
+
+                this.updateProgress(100, 'All tests completed!');
+
+                this.logResult(
+                    'Test Suite Complete',
+                    '🎉 All tests finished',
+                    `Total: ${this.totalTests}, Passed: ${this.passedTests}, Failed: ${this.failedTests}`,
+                    this.failedTests === 0 ? 'success' : 'warning'
+                );
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            clearResults() {
+                document.getElementById('test-results').innerHTML = '';
+                document.getElementById('user-simulations').innerHTML = '';
+                document.getElementById('performance-metrics').innerHTML = '';
+
+                this.testResults = [];
+                this.userSimulations = [];
+                this.performanceMetrics = [];
+                this.totalTests = 0;
+                this.passedTests = 0;
+                this.failedTests = 0;
+                this.responseTimes = [];
+
+                this.updateStats();
+                this.updateProgress(0, 'Ready to start testing...');
+            }
+        }
+
+        // Initialize test suite
+        const testSuite = new QuizTestSuite();
+
+        // Global functions for buttons
+        function runAllTests() {
+            testSuite.runAllTests();
+        }
+
+        function simulateMultipleUsers() {
+            testSuite.simulateUsers(10);
+        }
+
+        function stressTest() {
+            testSuite.simulateUsers(100);
+        }
+
+        function crossPlatformTest() {
+            testSuite.testCrossPlatform();
+        }
+
+        function clearResults() {
+            testSuite.clearResults();
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testSuite.testDatabaseLoading();
+                testSuite.testQuestionLoading();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
