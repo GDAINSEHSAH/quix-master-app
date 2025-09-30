@@ -114,10 +114,21 @@ class GameLogic {
     // Calculate score based on time remaining and difficulty
     calculateScore() {
         const baseScore = 100;
-        const timeBonus = Math.max(0, this.timeRemaining * 2);
-        const levelMultiplier = 1 + (this.currentLevel - 1) * 0.1;
+        const timeLimit = this.getTimeLimit();
 
-        return Math.round((baseScore + timeBonus) * levelMultiplier);
+        // Time bonus: more points for faster answers
+        const timeBonus = Math.max(0, (this.timeRemaining / timeLimit) * 50);
+
+        // Level multiplier: higher levels give more points
+        const levelMultiplier = 1 + (this.currentLevel - 1) * 0.2;
+
+        // Accuracy bonus for streak (if applicable)
+        const streakBonus = 0; // Can be enhanced later
+
+        const totalScore = Math.round((baseScore + timeBonus + streakBonus) * levelMultiplier);
+
+        // Ensure minimum score of 10 for correct answers
+        return Math.max(10, totalScore);
     }
 
     // Move to next question

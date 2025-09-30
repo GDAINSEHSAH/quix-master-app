@@ -42,13 +42,26 @@ class DataManager {
     // Load questions for a specific section and level
     async loadQuestions(section, level) {
         try {
-            // In a real application, you might fetch from an API
-            // For now, we'll use the local database
+            // Check if we have questions in the database
             if (QUIZ_DATABASE[section] && QUIZ_DATABASE[section].levels[level]) {
-                return QUIZ_DATABASE[section].levels[level];
+                const questions = [...QUIZ_DATABASE[section].levels[level]]; // Create a copy
+
+                // Shuffle questions to ensure variety
+                this.shuffleArray(questions);
+
+                // Return only 10 questions for the quiz (or all if less than 10)
+                return questions.slice(0, 10);
             } else {
-                // Generate questions dynamically or load from API
-                return this.generateQuestionsForLevel(section, level);
+                // If no questions exist for this level, return questions from previous level
+                // This ensures the game doesn't break for missing levels
+                console.warn(`No questions found for ${section} level ${level}, using previous level`);
+                const fallbackLevel = Math.max(1, level - 1);
+                if (QUIZ_DATABASE[section] && QUIZ_DATABASE[section].levels[fallbackLevel]) {
+                    const questions = [...QUIZ_DATABASE[section].levels[fallbackLevel]];
+                    this.shuffleArray(questions);
+                    return questions.slice(0, 10);
+                }
+                return [];
             }
         } catch (error) {
             console.error('Error loading questions:', error);
@@ -318,6 +331,15 @@ class DataManager {
             console.error('Error importing progress:', error);
             return false;
         }
+    }
+
+    // Shuffle array utility
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
 }
 
