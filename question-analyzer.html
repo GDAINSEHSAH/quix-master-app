@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Database Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .duplicate-list {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .question-item {
+            margin: 5px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+            border-left: 3px solid #dc3545;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #f8f9fa;
+        }
+        .level-header {
+            background: #e3f2fd;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Question Database Analyzer</h1>
+        <p>Deep analysis of question distribution and duplicates</p>
+    </div>
+
+    <div class="section">
+        <h3>🎮 Controls</h3>
+        <button onclick="analyzeAllQuestions()">🔍 Analyze All Questions</button>
+        <button onclick="findDuplicates()">🔎 Find Duplicates</button>
+        <button onclick="analyzeDistribution()">📊 Analyze Distribution</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="total-questions">0</div>
+            <div class="stat-label">Total Questions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="unique-questions">0</div>
+            <div class="stat-label">Unique Questions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="duplicate-count">0</div>
+            <div class="stat-label">Duplicates Found</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="sections-with-issues">0</div>
+            <div class="stat-label">Sections with Issues</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>📊 Analysis Results</h3>
+        <div id="analysis-results"></div>
+    </div>
+
+    <div class="section">
+        <h3>🔍 Duplicate Questions</h3>
+        <div id="duplicate-results"></div>
+    </div>
+
+    <div class="section">
+        <h3>📈 Question Distribution</h3>
+        <div id="distribution-results"></div>
+    </div>
+
+    <script src="data/questions.js"></script>
+
+    <script>
+        class QuestionAnalyzer {
+            constructor() {
+                this.allQuestions = [];
+                this.duplicates = [];
+                this.distribution = {};
+            }
+
+            analyzeAllQuestions() {
+                this.clearResults();
+                this.logResult('🔍 Starting comprehensive question analysis...', 'info');
+
+                if (typeof QUIZ_DATABASE === 'undefined') {
+                    this.logResult('❌ QUIZ_DATABASE not found!', 'error');
+                    return;
+                }
+
+                this.allQuestions = [];
+                let totalQuestions = 0;
+                let sectionsWithIssues = 0;
+
+                const sections = Object.keys(QUIZ_DATABASE);
+                this.logResult(`📚 Found ${sections.length} sections: ${sections.join(', ')}`, 'info');
+
+                for (const sectionId of sections) {
+                    const section = QUIZ_DATABASE[sectionId];
+                    this.logResult(`\n📖 Analyzing section: ${section.name}`, 'info');
+
+                    if (!section.levels) {
+                        this.logResult(`❌ No levels found in ${sectionId}`, 'error');
+                        sectionsWithIssues++;
+                        continue;
+                    }
+
+                    const levels = Object.keys(section.levels);
+                    this.logResult(`📊 Found ${levels.length} levels: ${levels.join(', ')}`, 'info');
+
+                    let sectionQuestions = 0;
+                    let sectionHasIssues = false;
+
+                    for (const levelId of levels) {
+                        const questions = section.levels[levelId];
+
+                        if (!Array.isArray(questions)) {
+                            this.logResult(`❌ Level ${levelId} is not an array`, 'error');
+                            sectionHasIssues = true;
+                            continue;
+                        }
+
+                        this.logResult(`  Level ${levelId}: ${questions.length} questions`,
+                            questions.length > 0 ? 'success' : 'warning');
+
+                        for (let i = 0; i < questions.length; i++) {
+                            const question = questions[i];
+                            this.allQuestions.push({
+                                text: question.question,
+                                section: sectionId,
+                                level: levelId,
+                                index: i,
+                                options: question.options,
+                                correct: question.correct,
+                                explanation: question.explanation
+                            });
+                            sectionQuestions++;
+                            totalQuestions++;
+                        }
+                    }
+
+                    this.logResult(`✅ Section ${sectionId} total: ${sectionQuestions} questions`,
+                        sectionQuestions > 0 ? 'success' : 'warning');
+
+                    if (sectionHasIssues) {
+                        sectionsWithIssues++;
+                    }
+                }
+
+                // Update stats
+                document.getElementById('total-questions').textContent = totalQuestions;
+                document.getElementById('sections-with-issues').textContent = sectionsWithIssues;
+
+                this.logResult(`\n🎯 Analysis Complete!`, 'success');
+                this.logResult(`Total questions collected: ${totalQuestions}`, 'info');
+
+                // Auto-run duplicate detection
+                this.findDuplicates();
+                this.analyzeDistribution();
+            }
+
+            findDuplicates() {
+                this.logResult('\n🔎 Searching for duplicate questions...', 'info');
+
+                if (this.allQuestions.length === 0) {
+                    this.logResult('⚠️ No questions loaded. Run "Analyze All Questions" first.', 'warning');
+                    return;
+                }
+
+                const questionMap = new Map();
+                const duplicates = [];
+
+                // Group questions by text
+                for (const question of this.allQuestions) {
+                    const text = question.text.trim().toLowerCase();
+
+                    if (!questionMap.has(text)) {
+                        questionMap.set(text, []);
+                    }
+                    questionMap.get(text).push(question);
+                }
+
+                // Find duplicates
+                for (const [text, questions] of questionMap) {
+                    if (questions.length > 1) {
+                        duplicates.push({
+                            text: text,
+                            instances: questions
+                        });
+                    }
+                }
+
+                this.duplicates = duplicates;
+                document.getElementById('duplicate-count').textContent = duplicates.length;
+
+                // Calculate unique questions
+                const uniqueQuestions = questionMap.size;
+                document.getElementById('unique-questions').textContent = uniqueQuestions;
+
+                if (duplicates.length === 0) {
+                    this.logResult('✅ No duplicate questions found!', 'success');
+                } else {
+                    this.logResult(`❌ Found ${duplicates.length} duplicate questions!`, 'error');
+
+                    // Display duplicates
+                    this.displayDuplicates();
+
+                    // Analyze duplicate patterns
+                    this.analyzeDuplicatePatterns();
+                }
+            }
+
+            displayDuplicates() {
+                const duplicateDiv = document.getElementById('duplicate-results');
+                duplicateDiv.innerHTML = '<h4>🔍 Duplicate Questions Found:</h4>';
+
+                for (let i = 0; i < this.duplicates.length; i++) {
+                    const duplicate = this.duplicates[i];
+
+                    const div = document.createElement('div');
+                    div.className = 'duplicate-list';
+
+                    div.innerHTML = `
+                        <h5>Duplicate #${i + 1}: "${duplicate.instances[0].text}"</h5>
+                        <p><strong>Found in ${duplicate.instances.length} locations:</strong></p>
+                    `;
+
+                    for (const instance of duplicate.instances) {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.className = 'question-item';
+                        questionDiv.innerHTML = `
+                            📍 <strong>${QUIZ_DATABASE[instance.section].name}</strong> - Level ${instance.level} - Question #${instance.index + 1}<br>
+                            <small>Options: ${instance.options.join(', ')}</small>
+                        `;
+                        div.appendChild(questionDiv);
+                    }
+
+                    duplicateDiv.appendChild(div);
+                }
+            }
+
+            analyzeDuplicatePatterns() {
+                const patterns = {
+                    sameSection: 0,
+                    crossSection: 0,
+                    sameLevelDifferentSection: 0,
+                    sameSectionDifferentLevel: 0
+                };
+
+                for (const duplicate of this.duplicates) {
+                    const instances = duplicate.instances;
+
+                    // Check if all instances are in the same section
+                    const sections = [...new Set(instances.map(q => q.section))];
+                    const levels = [...new Set(instances.map(q => q.level))];
+
+                    if (sections.length === 1) {
+                        if (levels.length === 1) {
+                            // Same section, same level - this shouldn't happen!
+                            this.logResult(`🚨 CRITICAL: Duplicate in same section AND level: ${sections[0]} Level ${levels[0]}`, 'error');
+                        } else {
+                            patterns.sameSectionDifferentLevel++;
+                        }
+                    } else {
+                        patterns.crossSection++;
+
+                        if (levels.length === 1) {
+                            patterns.sameLevelDifferentSection++;
+                        }
+                    }
+                }
+
+                this.logResult('\n📊 Duplicate Patterns Analysis:', 'info');
+                this.logResult(`🔄 Same section, different levels: ${patterns.sameSectionDifferentLevel}`, 'warning');
+                this.logResult(`↔️ Different sections, same level: ${patterns.sameLevelDifferentSection}`, 'warning');
+                this.logResult(`🌐 Cross-section duplicates: ${patterns.crossSection}`, 'warning');
+            }
+
+            analyzeDistribution() {
+                this.logResult('\n📈 Analyzing question distribution...', 'info');
+
+                if (this.allQuestions.length === 0) {
+                    this.logResult('⚠️ No questions loaded. Run "Analyze All Questions" first.', 'warning');
+                    return;
+                }
+
+                const distribution = {};
+
+                // Initialize distribution object
+                for (const sectionId of Object.keys(QUIZ_DATABASE)) {
+                    distribution[sectionId] = {};
+
+                    if (QUIZ_DATABASE[sectionId].levels) {
+                        for (const levelId of Object.keys(QUIZ_DATABASE[sectionId].levels)) {
+                            distribution[sectionId][levelId] = 0;
+                        }
+                    }
+                }
+
+                // Count questions
+                for (const question of this.allQuestions) {
+                    if (distribution[question.section] && distribution[question.section][question.level] !== undefined) {
+                        distribution[question.section][question.level]++;
+                    }
+                }
+
+                // Display distribution table
+                this.displayDistributionTable(distribution);
+
+                // Analyze distribution issues
+                this.analyzeDistributionIssues(distribution);
+            }
+
+            displayDistributionTable(distribution) {
+                const distributionDiv = document.getElementById('distribution-results');
+
+                let tableHTML = `
+                    <h4>📊 Question Distribution by Section and Level</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Section</th>
+                                <th>Level 1</th>
+                                <th>Level 2</th>
+                                <th>Level 3</th>
+                                <th>Level 4</th>
+                                <th>Level 5</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                for (const [sectionId, levels] of Object.entries(distribution)) {
+                    const sectionName = QUIZ_DATABASE[sectionId].name;
+                    let sectionTotal = 0;
+
+                    tableHTML += `<tr><td class="level-header">${sectionName}</td>`;
+
+                    for (let level = 1; level <= 5; level++) {
+                        const count = levels[level] || 0;
+                        sectionTotal += count;
+
+                        const cellClass = count === 0 ? 'style="background-color: #ffebee; color: #c62828;"' :
+                                         count < 10 ? 'style="background-color: #fff3e0; color: #ef6c00;"' : '';
+
+                        tableHTML += `<td ${cellClass}>${count}</td>`;
+                    }
+
+                    tableHTML += `<td style="font-weight: bold;">${sectionTotal}</td></tr>`;
+                }
+
+                tableHTML += '</tbody></table>';
+                distributionDiv.innerHTML = tableHTML;
+            }
+
+            analyzeDistributionIssues(distribution) {
+                this.logResult('\n🔍 Distribution Issues Analysis:', 'info');
+
+                let totalIssues = 0;
+
+                for (const [sectionId, levels] of Object.entries(distribution)) {
+                    const sectionName = QUIZ_DATABASE[sectionId].name;
+                    let sectionIssues = [];
+
+                    // Check for missing levels
+                    for (let level = 1; level <= 10; level++) {
+                        const count = levels[level] || 0;
+
+                        if (count === 0) {
+                            sectionIssues.push(`Level ${level}: No questions`);
+                        } else if (count < 10) {
+                            sectionIssues.push(`Level ${level}: Only ${count} questions (recommend 15+)`);
+                        }
+                    }
+
+                    if (sectionIssues.length > 0) {
+                        this.logResult(`⚠️ ${sectionName}:`, 'warning');
+                        for (const issue of sectionIssues.slice(0, 3)) { // Show first 3 issues
+                            this.logResult(`  - ${issue}`, 'warning');
+                        }
+                        if (sectionIssues.length > 3) {
+                            this.logResult(`  - ... and ${sectionIssues.length - 3} more issues`, 'warning');
+                        }
+                        totalIssues += sectionIssues.length;
+                    } else {
+                        this.logResult(`✅ ${sectionName}: No distribution issues`, 'success');
+                    }
+                }
+
+                if (totalIssues === 0) {
+                    this.logResult('🎉 No distribution issues found!', 'success');
+                } else {
+                    this.logResult(`📊 Total distribution issues: ${totalIssues}`, 'warning');
+                }
+            }
+
+            logResult(message, type = 'info') {
+                const div = document.createElement('div');
+                div.className = `result ${type}`;
+                div.textContent = message;
+                document.getElementById('analysis-results').appendChild(div);
+                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            clearResults() {
+                document.getElementById('analysis-results').innerHTML = '';
+                document.getElementById('duplicate-results').innerHTML = '';
+                document.getElementById('distribution-results').innerHTML = '';
+
+                // Reset stats
+                document.getElementById('total-questions').textContent = '0';
+                document.getElementById('unique-questions').textContent = '0';
+                document.getElementById('duplicate-count').textContent = '0';
+                document.getElementById('sections-with-issues').textContent = '0';
+            }
+        }
+
+        // Initialize analyzer
+        const analyzer = new QuestionAnalyzer();
+
+        // Global functions
+        function analyzeAllQuestions() {
+            analyzer.analyzeAllQuestions();
+        }
+
+        function findDuplicates() {
+            analyzer.findDuplicates();
+        }
+
+        function analyzeDistribution() {
+            analyzer.analyzeDistribution();
+        }
+
+        function clearResults() {
+            analyzer.clearResults();
+        }
+
+        // Auto-run analysis on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                analyzer.analyzeAllQuestions();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
