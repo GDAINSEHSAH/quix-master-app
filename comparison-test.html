@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working vs Main App Comparison</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .comparison-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        .app-panel {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .app-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+        .working { border-color: #28a745; }
+        .main { border-color: #dc3545; }
+        .app-frame {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+            margin-bottom: 20px;
+        }
+        .test-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-good { background: #28a745; }
+        .status-bad { background: #dc3545; }
+        .status-unknown { background: #6c757d; }
+        .comparison-log {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .analysis-panel {
+            grid-column: 1 / -1;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            margin-top: 20px;
+        }
+        .metric-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        .metric-title {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .difference {
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        .better { color: #28a745; }
+        .worse { color: #dc3545; }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="comparison-container">
+        <h1>🔍 Working vs Main App Comparison</h1>
+        <p style="text-align: center; margin-bottom: 30px; opacity: 0.9;">
+            Side-by-side comparison to identify why the main app shows "something went wrong"
+        </p>
+
+        <div class="test-controls full-width" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+            <button onclick="runComparison()">🚀 Run Full Comparison</button>
+            <button onclick="testLoadTimes()">⏱️ Test Load Times</button>
+            <button onclick="testJavaScript()">📜 Test JavaScript</button>
+            <button onclick="clearLogs()">🗑️ Clear Logs</button>
+        </div>
+
+        <div class="comparison-grid">
+            <!-- Working Version -->
+            <div class="app-panel working">
+                <div class="app-header">
+                    <span class="status-indicator status-good"></span>
+                    ✅ Working Version
+                </div>
+                <iframe id="working-frame" class="app-frame"
+                        src="simple-working.html"
+                        onload="onWorkingLoad()">
+                </iframe>
+                <div class="test-controls">
+                    <button onclick="reloadWorking()">🔄 Reload</button>
+                    <button onclick="testWorkingSound()">🔊 Test Sound</button>
+                </div>
+                <div id="working-status">Status: Loading...</div>
+            </div>
+
+            <!-- Main App -->
+            <div class="app-panel main">
+                <div class="app-header">
+                    <span class="status-indicator status-unknown"></span>
+                    🚨 Main App
+                </div>
+                <iframe id="main-frame" class="app-frame"
+                        src="https://gdainsehsah.github.io/quix-master-app/"
+                        onload="onMainLoad()"
+                        onerror="onMainError()">
+                </iframe>
+                <div class="test-controls">
+                    <button onclick="reloadMain()">🔄 Reload</button>
+                    <button onclick="testMainSound()">🔊 Test Sound</button>
+                </div>
+                <div id="main-status">Status: Loading...</div>
+            </div>
+        </div>
+
+        <!-- Analysis Panel -->
+        <div class="analysis-panel">
+            <div class="app-header">📊 Comparison Analysis</div>
+
+            <div class="metric-comparison">
+                <div class="metric-card">
+                    <div class="metric-title">Load Status</div>
+                    <div class="metric-value" id="load-comparison">Testing...</div>
+                    <div class="difference" id="load-difference"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Load Time</div>
+                    <div class="metric-value" id="time-comparison">Testing...</div>
+                    <div class="difference" id="time-difference"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">JavaScript Errors</div>
+                    <div class="metric-value" id="error-comparison">Testing...</div>
+                    <div class="difference" id="error-difference"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Network Requests</div>
+                    <div class="metric-value" id="network-comparison">Testing...</div>
+                    <div class="difference" id="network-difference"></div>
+                </div>
+            </div>
+
+            <div class="comparison-log" id="analysis-log">Comparison analysis will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        let workingLoadTime = 0;
+        let mainLoadTime = 0;
+        let workingErrors = 0;
+        let mainErrors = 0;
+        let workingLoaded = false;
+        let mainLoaded = false;
+
+        function log(message) {
+            const logEl = document.getElementById('analysis-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLogs() {
+            document.getElementById('analysis-log').textContent = '';
+        }
+
+        function updateStatus(type, message, isGood = null) {
+            const statusEl = document.getElementById(`${type}-status`);
+            statusEl.textContent = `Status: ${message}`;
+
+            const indicator = document.querySelector(`.${type} .status-indicator`);
+            if (isGood === true) {
+                indicator.className = 'status-indicator status-good';
+            } else if (isGood === false) {
+                indicator.className = 'status-indicator status-bad';
+            } else {
+                indicator.className = 'status-indicator status-unknown';
+            }
+        }
+
+        function onWorkingLoad() {
+            workingLoadTime = performance.now();
+            workingLoaded = true;
+            updateStatus('working', 'Loaded successfully', true);
+            log('✅ Working version loaded successfully');
+
+            // Try to access working version content
+            try {
+                const iframe = document.getElementById('working-frame');
+                const doc = iframe.contentDocument;
+                if (doc) {
+                    log('✅ Working version: Content accessible');
+
+                    // Check for quiz elements
+                    setTimeout(() => {
+                        try {
+                            const sections = doc.querySelectorAll('.section-card');
+                            log(`✅ Working version: Found ${sections.length} quiz sections`);
+
+                            const mainMenu = doc.querySelector('#main-menu');
+                            if (mainMenu && mainMenu.style.display !== 'none') {
+                                log('✅ Working version: Main menu visible');
+                            }
+                        } catch (e) {
+                            log(`⚠️ Working version: Cannot inspect content - ${e.message}`);
+                        }
+                    }, 1000);
+                }
+            } catch (e) {
+                log(`⚠️ Working version: Cannot access content - ${e.message}`);
+            }
+
+            updateComparison();
+        }
+
+        function onMainLoad() {
+            mainLoadTime = performance.now();
+            mainLoaded = true;
+            updateStatus('main', 'Loaded (checking content...)', null);
+            log('📝 Main app iframe loaded, checking content...');
+
+            // Try to access main app content
+            try {
+                const iframe = document.getElementById('main-frame');
+                const doc = iframe.contentDocument;
+                if (doc) {
+                    log('✅ Main app: Content accessible');
+
+                    // Check for error messages
+                    setTimeout(() => {
+                        try {
+                            const body = doc.body;
+                            const bodyText = body ? body.textContent.toLowerCase() : '';
+
+                            if (bodyText.includes('something went wrong') ||
+                                bodyText.includes('error') ||
+                                bodyText.includes('failed')) {
+                                log('🚨 Main app: Error message detected in content');
+                                updateStatus('main', 'Error detected in content', false);
+                            } else {
+                                log('✅ Main app: No error messages found');
+                                updateStatus('main', 'Content appears normal', true);
+                            }
+
+                            // Check for loading screen
+                            const loadingScreen = doc.querySelector('#loading-screen');
+                            if (loadingScreen) {
+                                const isVisible = !loadingScreen.classList.contains('hidden') &&
+                                                !loadingScreen.classList.contains('active');
+                                log(`📱 Main app: Loading screen ${isVisible ? 'visible' : 'hidden'}`);
+                            }
+
+                            // Check for main content
+                            const mainScreen = doc.querySelector('#main-screen');
+                            if (mainScreen) {
+                                const isVisible = mainScreen.style.display !== 'none';
+                                log(`📱 Main app: Main screen ${isVisible ? 'visible' : 'hidden'}`);
+                            }
+
+                        } catch (e) {
+                            log(`⚠️ Main app: Cannot inspect content - ${e.message}`);
+                        }
+                    }, 2000);
+                }
+            } catch (e) {
+                log(`⚠️ Main app: Cannot access content (CORS) - ${e.message}`);
+                updateStatus('main', 'Loaded but cannot inspect (CORS)', null);
+            }
+
+            updateComparison();
+        }
+
+        function onMainError() {
+            log('❌ Main app failed to load in iframe');
+            updateStatus('main', 'Failed to load', false);
+            mainErrors++;
+            updateComparison();
+        }
+
+        function reloadWorking() {
+            log('🔄 Reloading working version...');
+            document.getElementById('working-frame').src = 'simple-working.html?' + Date.now();
+            workingLoaded = false;
+            updateStatus('working', 'Reloading...', null);
+        }
+
+        function reloadMain() {
+            log('🔄 Reloading main app...');
+            document.getElementById('main-frame').src = 'https://gdainsehsah.github.io/quix-master-app/?' + Date.now();
+            mainLoaded = false;
+            updateStatus('main', 'Reloading...', null);
+        }
+
+        function testWorkingSound() {
+            log('🔊 Testing working version sound...');
+            try {
+                const iframe = document.getElementById('working-frame');
+                const win = iframe.contentWindow;
+                if (win && win.testSound) {
+                    win.testSound();
+                    log('✅ Working version sound test triggered');
+                } else {
+                    log('⚠️ Working version sound function not found');
+                }
+            } catch (e) {
+                log(`❌ Working version sound test failed: ${e.message}`);
+            }
+        }
+
+        function testMainSound() {
+            log('🔊 Testing main app sound...');
+            try {
+                const iframe = document.getElementById('main-frame');
+                const win = iframe.contentWindow;
+                if (win && win.audioManager) {
+                    win.audioManager.testAllSounds();
+                    log('✅ Main app sound test triggered');
+                } else {
+                    log('⚠️ Main app audioManager not found');
+                }
+            } catch (e) {
+                log(`❌ Main app sound test failed: ${e.message}`);
+            }
+        }
+
+        async function testLoadTimes() {
+            log('⏱️ Testing load times...');
+
+            // Test working version
+            const workingStart = performance.now();
+            try {
+                const workingResponse = await fetch('simple-working.html');
+                const workingEnd = performance.now();
+                const workingTime = Math.round(workingEnd - workingStart);
+                log(`✅ Working version load time: ${workingTime}ms`);
+            } catch (e) {
+                log(`❌ Working version load test failed: ${e.message}`);
+            }
+
+            // Test main app
+            const mainStart = performance.now();
+            try {
+                const mainResponse = await fetch('https://gdainsehsah.github.io/quix-master-app/');
+                const mainEnd = performance.now();
+                const mainTime = Math.round(mainEnd - mainStart);
+                log(`📝 Main app load time: ${mainTime}ms`);
+            } catch (e) {
+                log(`❌ Main app load test failed: ${e.message}`);
+            }
+
+            updateComparison();
+        }
+
+        async function testJavaScript() {
+            log('📜 Testing JavaScript execution...');
+
+            // Test if main app JavaScript is working
+            try {
+                const response = await fetch('https://gdainsehsah.github.io/quix-master-app/js/audio-manager-fixed.js');
+                const jsContent = await response.text();
+                log(`✅ Main app JS file loaded (${jsContent.length} chars)`);
+
+                // Check for syntax errors
+                try {
+                    new Function(jsContent);
+                    log('✅ Main app JS syntax appears valid');
+                } catch (syntaxError) {
+                    log(`❌ Main app JS syntax error: ${syntaxError.message}`);
+                    mainErrors++;
+                }
+            } catch (e) {
+                log(`❌ Main app JS loading failed: ${e.message}`);
+                mainErrors++;
+            }
+
+            updateComparison();
+        }
+
+        function updateComparison() {
+            // Load Status
+            const loadStatus = workingLoaded && mainLoaded ? 'Both Loaded' :
+                              workingLoaded ? 'Working Only' :
+                              mainLoaded ? 'Main Only' : 'Neither Loaded';
+            document.getElementById('load-comparison').textContent = loadStatus;
+
+            // Load Time
+            if (workingLoadTime && mainLoadTime) {
+                const timeDiff = Math.round(mainLoadTime - workingLoadTime);
+                document.getElementById('time-comparison').textContent =
+                    `${Math.round(mainLoadTime)}ms vs ${Math.round(workingLoadTime)}ms`;
+                document.getElementById('time-difference').textContent =
+                    timeDiff > 0 ? `Main ${timeDiff}ms slower` : `Main ${Math.abs(timeDiff)}ms faster`;
+                document.getElementById('time-difference').className =
+                    timeDiff > 0 ? 'difference worse' : 'difference better';
+            }
+
+            // Errors
+            document.getElementById('error-comparison').textContent = `${mainErrors} vs ${workingErrors}`;
+            if (mainErrors > workingErrors) {
+                document.getElementById('error-difference').textContent = 'Main has more errors';
+                document.getElementById('error-difference').className = 'difference worse';
+            } else if (mainErrors < workingErrors) {
+                document.getElementById('error-difference').textContent = 'Main has fewer errors';
+                document.getElementById('error-difference').className = 'difference better';
+            } else {
+                document.getElementById('error-difference').textContent = 'Same error count';
+                document.getElementById('error-difference').className = 'difference';
+            }
+
+            // Network (placeholder)
+            document.getElementById('network-comparison').textContent = 'Testing...';
+        }
+
+        async function runComparison() {
+            log('🚀 Starting comprehensive comparison...');
+            clearLogs();
+
+            log('📊 COMPARISON TEST STARTED');
+            log('==========================');
+
+            // Step 1: Test load times
+            await testLoadTimes();
+
+            // Step 2: Test JavaScript
+            await testJavaScript();
+
+            // Step 3: Test specific differences
+            log('🔍 Analyzing differences...');
+
+            try {
+                // Compare file sizes
+                const workingResponse = await fetch('simple-working.html');
+                const workingSize = (await workingResponse.text()).length;
+
+                const mainResponse = await fetch('https://gdainsehsah.github.io/quix-master-app/');
+                const mainSize = (await mainResponse.text()).length;
+
+                log(`📏 File sizes: Working ${workingSize} bytes vs Main ${mainSize} bytes`);
+
+                // Analyze complexity
+                if (mainSize > workingSize * 2) {
+                    log('📊 Main app is significantly more complex');
+                    log('💡 Recommendation: Simplify main app or optimize loading');
+                }
+
+            } catch (e) {
+                log(`❌ Size comparison failed: ${e.message}`);
+            }
+
+            // Step 4: Recommendations
+            log('\n🎯 RECOMMENDATIONS:');
+            if (mainErrors > 0) {
+                log('• Fix JavaScript errors in main app');
+                log('• Check browser console for specific error messages');
+            }
+            if (!mainLoaded || !workingLoaded) {
+                log('• Check iframe loading issues');
+                log('• Verify network connectivity');
+            }
+
+            log('\n📋 NEXT STEPS:');
+            log('1. Open browser console (F12) on main app');
+            log('2. Look for JavaScript errors or warnings');
+            log('3. Check if loading screen is stuck');
+            log('4. Verify all script files are loading correctly');
+
+            updateComparison();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🔍 Comparison test ready');
+            log('Loading working version and main app for comparison...');
+
+            // Auto-start comparison after a delay
+            setTimeout(runComparison, 3000);
+        });
+    </script>
+</body>
+</html>
