@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Sound Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            min-width: 200px;
+        }
+        button:hover { background: #45a049; }
+        .wrong { background: #f44336; }
+        .wrong:hover { background: #da190b; }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔊 Quick Sound Test</h1>
+        <p>This tests if the audio fix is working by simulating quiz answers.</p>
+
+        <div id="status" class="status">
+            Click a button below to test sound effects
+        </div>
+
+        <div>
+            <button onclick="testCorrectAnswer()">✅ Correct Answer</button>
+            <button onclick="testWrongAnswer()" class="wrong">❌ Wrong Answer</button>
+        </div>
+
+        <div>
+            <button onclick="testAchievement()">🏆 Achievement</button>
+            <button onclick="testAllSounds()">🎵 Test All Sounds</button>
+        </div>
+
+        <div>
+            <button onclick="window.open('https://gdainsehsah.github.io/quix-master-app', '_blank')">
+                🚀 Open Full App
+            </button>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3>How to test:</h3>
+            <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <li>Click any button above</li>
+                <li>You should hear a sound effect</li>
+                <li>If no sound, check browser audio permissions</li>
+                <li>Test the full app with the "Open Full App" button</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Load the same audio manager as the main app -->
+    <script src="js/audio-manager-fixed.js"></script>
+
+    <script>
+        function setStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        function testCorrectAnswer() {
+            setStatus('Testing correct answer sound...', 'info');
+
+            if (window.audioManager) {
+                window.audioManager.playCorrect();
+                setTimeout(() => {
+                    setStatus('✅ Correct sound played! You should hear ascending notes.', 'success');
+                }, 500);
+            } else {
+                setStatus('❌ AudioManager not found', 'error');
+            }
+        }
+
+        function testWrongAnswer() {
+            setStatus('Testing wrong answer sound...', 'info');
+
+            if (window.audioManager) {
+                window.audioManager.playWrong();
+                setTimeout(() => {
+                    setStatus('❌ Wrong sound played! You should hear descending notes.', 'success');
+                }, 500);
+            } else {
+                setStatus('❌ AudioManager not found', 'error');
+            }
+        }
+
+        function testAchievement() {
+            setStatus('Testing achievement sound...', 'info');
+
+            if (window.audioManager) {
+                window.audioManager.playAchievement();
+                setTimeout(() => {
+                    setStatus('🏆 Achievement sound played! You should hear a victory melody.', 'success');
+                }, 800);
+            } else {
+                setStatus('❌ AudioManager not found', 'error');
+            }
+        }
+
+        function testAllSounds() {
+            setStatus('Testing all sounds in sequence...', 'info');
+
+            if (window.audioManager) {
+                window.audioManager.testAllSounds();
+                setTimeout(() => {
+                    setStatus('🎵 All sounds played! You should have heard: correct, wrong, powerup, achievement.', 'success');
+                }, 2500);
+            } else {
+                setStatus('❌ AudioManager not found', 'error');
+            }
+        }
+
+        // Check AudioManager status on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (window.audioManager) {
+                    setStatus('✅ AudioManager loaded successfully! Ready to test sounds.', 'success');
+                    console.log('🔊 AudioManager available:', window.audioManager);
+                    console.log('🧪 Audio stats:', window.audioManager.getAudioStats());
+                } else {
+                    setStatus('❌ AudioManager failed to load', 'error');
+                }
+            }, 1000);
+        });
+
+        // Enable audio on first user interaction
+        document.addEventListener('click', function() {
+            if (window.audioManager && window.audioManager.audioContext) {
+                if (window.audioManager.audioContext.state === 'suspended') {
+                    window.audioManager.audioContext.resume();
+                    console.log('🔓 Audio context resumed');
+                }
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
