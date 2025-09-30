@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Diagnostic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .diagnostic {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagnostic">
+        <h1>🔍 Quiz Master Diagnostic</h1>
+        <p>This page will help diagnose what's wrong with the main app.</p>
+
+        <div id="status" class="status warning">Running diagnostics...</div>
+
+        <button onclick="testMainApp()">🚀 Test Main App</button>
+        <button onclick="runDiagnostics()">🔍 Run Full Diagnostics</button>
+        <button onclick="clearLog()">🗑️ Clear Log</button>
+
+        <h3>Diagnostic Log:</h3>
+        <div id="log" class="log">Starting diagnostic...\n</div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        function setStatus(message, type = 'warning') {
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${type}`;
+            statusEl.textContent = message;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        async function testMainApp() {
+            log('🌐 Testing main app accessibility...');
+
+            try {
+                const response = await fetch('https://gdainsehsah.github.io/quix-master-app/');
+                const html = await response.text();
+
+                log(`✅ Main app loaded (${html.length} characters)`);
+
+                // Check for loading screen
+                if (html.includes('loading-screen')) {
+                    log('✅ Loading screen found');
+                } else {
+                    log('❌ Loading screen missing');
+                }
+
+                // Check for main content
+                if (html.includes('main-screen')) {
+                    log('✅ Main screen found');
+                } else {
+                    log('❌ Main screen missing');
+                }
+
+                // Check for script tags
+                const scriptMatches = html.match(/<script src/g);
+                log(`✅ Found ${scriptMatches ? scriptMatches.length : 0} script tags`);
+
+                // Check for CSS
+                if (html.includes('style-enhanced.css')) {
+                    log('✅ Enhanced CSS referenced');
+                } else {
+                    log('❌ Enhanced CSS missing');
+                }
+
+                setStatus('Main app structure looks OK', 'success');
+
+            } catch (error) {
+                log(`❌ Failed to load main app: ${error.message}`);
+                setStatus(`Failed to load main app: ${error.message}`, 'error');
+            }
+        }
+
+        async function runDiagnostics() {
+            log('🔍 Running comprehensive diagnostics...');
+            clearLog();
+
+            // Test 1: Main HTML
+            await testMainApp();
+
+            // Test 2: Critical JavaScript files
+            const jsFiles = [
+                'js/audio-manager-fixed.js',
+                'js/data-manager-enhanced.js',
+                'js/game-logic-enhanced.js',
+                'js/ui-manager-enhanced.js',
+                'js/app-enhanced.js',
+                'data/questions.js'
+            ];
+
+            for (const file of jsFiles) {
+                try {
+                    const response = await fetch(`https://gdainsehsah.github.io/quix-master-app/${file}`);
+                    if (response.ok) {
+                        const content = await response.text();
+                        log(`✅ ${file} (${content.length} chars)`);
+                    } else {
+                        log(`❌ ${file} - HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    log(`❌ ${file} - ${error.message}`);
+                }
+            }
+
+            // Test 3: CSS
+            try {
+                const response = await fetch('https://gdainsehsah.github.io/quix-master-app/css/style-enhanced.css');
+                if (response.ok) {
+                    log('✅ Enhanced CSS loaded');
+                } else {
+                    log(`❌ Enhanced CSS - HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Enhanced CSS - ${error.message}`);
+            }
+
+            // Test 4: Manifest
+            try {
+                const response = await fetch('https://gdainsehsah.github.io/quix-master-app/manifest.json');
+                if (response.ok) {
+                    log('✅ PWA Manifest loaded');
+                } else {
+                    log(`❌ PWA Manifest - HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ PWA Manifest - ${error.message}`);
+            }
+
+            log('\n📊 DIAGNOSTIC COMPLETE');
+            log('If all files show ✅, the issue might be JavaScript runtime errors.');
+            log('Check your browser console (F12) for JavaScript errors.');
+
+            setStatus('Diagnostics complete - check log for details', 'success');
+        }
+
+        // Auto-run basic diagnostics
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runDiagnostics, 1000);
+        });
+    </script>
+</body>
+</html>
