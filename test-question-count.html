@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Question Count Verification</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #0f0; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Question Count Verification Test</h1>
+    <p>Testing if all quiz sections have proper question counts...</p>
+
+    <div id="results"></div>
+
+    <script src="data/questions.js"></script>
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function log(message, type = 'normal') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(div);
+            console.log(message);
+        }
+
+        function testQuestionDatabase() {
+            log('🚀 Starting question database verification...');
+
+            if (typeof QUIZ_DATABASE === 'undefined') {
+                log('❌ QUIZ_DATABASE not loaded!', 'error');
+                return;
+            }
+
+            log('✅ QUIZ_DATABASE loaded successfully', 'success');
+
+            const sections = Object.keys(QUIZ_DATABASE);
+            log(`📊 Found ${sections.length} sections: ${sections.join(', ')}`, 'success');
+
+            sections.forEach(sectionKey => {
+                const section = QUIZ_DATABASE[sectionKey];
+                log(`<br>🔸 Testing section: ${sectionKey} (${section.name})`);
+
+                let totalQuestions = 0;
+                const levels = section.levels || {};
+
+                for (let level = 1; level <= 10; level++) {
+                    if (levels[level]) {
+                        const levelQuestions = levels[level].length;
+                        totalQuestions += levelQuestions;
+                        log(`  Level ${level}: ${levelQuestions} questions`, 'success');
+                    } else {
+                        log(`  Level ${level}: Missing!`, 'error');
+                    }
+                }
+
+                log(`  📈 Total questions in ${sectionKey}: ${totalQuestions}`, totalQuestions >= 50 ? 'success' : 'warning');
+
+                // Test question availability for quiz interface
+                let availableForQuiz = [];
+                for (let level = 1; level <= 10; level++) {
+                    if (levels[level]) {
+                        availableForQuiz = availableForQuiz.concat(levels[level]);
+                    }
+                }
+
+                const maxQuestions = Math.min(15, availableForQuiz.length);
+                log(`  🎯 Questions available for quiz session: ${maxQuestions}/15`, maxQuestions >= 10 ? 'success' : 'warning');
+            });
+
+            // Test the conversion logic used in main app
+            log('<br>🔄 Testing main app conversion logic...');
+            let convertedQuizData = {};
+
+            sections.forEach(sectionKey => {
+                const section = QUIZ_DATABASE[sectionKey];
+                convertedQuizData[sectionKey] = [];
+
+                // Combine questions from all levels (same logic as index.html)
+                for (let level = 1; level <= 10; level++) {
+                    if (section.levels && section.levels[level]) {
+                        convertedQuizData[sectionKey] = convertedQuizData[sectionKey].concat(section.levels[level]);
+                    }
+                }
+
+                log(`  📋 ${sectionKey}: ${convertedQuizData[sectionKey].length} combined questions`,
+                    convertedQuizData[sectionKey].length >= 10 ? 'success' : 'error');
+            });
+
+            log('<br>✅ Question count verification complete!', 'success');
+        }
+
+        // Run test
+        testQuestionDatabase();
+    </script>
+</body>
+</html>

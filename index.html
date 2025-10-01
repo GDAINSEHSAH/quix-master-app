@@ -428,7 +428,7 @@
 
             const question = currentQuiz[currentQuestion];
             document.getElementById('question-text').textContent = question.question;
-            document.getElementById('score-text').textContent = `Score: ${score}/${currentQuestion}`;
+            document.getElementById('score-text').textContent = `Score: ${score}/${currentQuiz.length}`;
 
             const container = document.getElementById('options-container');
             container.innerHTML = '';
