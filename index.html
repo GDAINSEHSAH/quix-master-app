@@ -249,6 +249,8 @@
 
             <div class="score-display">
                 <span id="score-text">Score: 0/0</span>
+                <br>
+                <span id="question-progress" style="font-size: 0.9em; opacity: 0.8;">Question 1 of 15</span>
             </div>
 
             <div class="question-box">
@@ -429,6 +431,7 @@
             const question = currentQuiz[currentQuestion];
             document.getElementById('question-text').textContent = question.question;
             document.getElementById('score-text').textContent = `Score: ${score}/${currentQuiz.length}`;
+            document.getElementById('question-progress').textContent = `Question ${currentQuestion + 1} of ${currentQuiz.length}`;
 
             const container = document.getElementById('options-container');
             container.innerHTML = '';
