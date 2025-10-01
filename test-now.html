@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Right Now</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 { font-size: 3em; margin: 20px 0; }
+        .status {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        button:hover { background: #218838; }
+        .red { background: #dc3545; }
+        .red:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <h1>🧪 IMMEDIATE TEST</h1>
+
+    <div class="status" id="status">
+        If you can see this page, the problem is specific to the main app.
+    </div>
+
+    <button onclick="testBasic()">✅ Test This Page Works</button>
+    <button onclick="testSound()" class="red">🔊 Test Sound</button>
+    <button onclick="openMain()">🚀 Try Main App Again</button>
+
+    <div id="output" style="margin-top: 30px; text-align: left; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
+        <strong>Test Results:</strong><br>
+        <span id="results">Click buttons above to test...</span>
+    </div>
+
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            results.innerHTML += '<br>' + new Date().toLocaleTimeString() + ': ' + message;
+        }
+
+        function testBasic() {
+            document.getElementById('status').innerHTML = '✅ SUCCESS: This page is working perfectly!';
+            document.getElementById('status').style.background = 'rgba(40, 167, 69, 0.8)';
+            log('✅ Basic functionality test PASSED');
+        }
+
+        function testSound() {
+            log('🔊 Testing sound...');
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+
+                log('✅ Sound test PASSED - You should hear a beep');
+            } catch (error) {
+                log('❌ Sound test FAILED: ' + error.message);
+            }
+        }
+
+        function openMain() {
+            log('🚀 Opening main app...');
+            window.open('https://gdainsehsah.github.io/quix-master-app/', '_blank');
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', function() {
+            log('📱 Page loaded successfully');
+            log('🌍 Browser: ' + navigator.userAgent.split(' ').slice(-2).join(' '));
+            log('📱 Screen: ' + window.screen.width + 'x' + window.screen.height);
+            log('🔊 Audio Context: ' + !!(window.AudioContext || window.webkitAudioContext));
+        });
+
+        // Enable audio on first click
+        document.addEventListener('click', function() {
+            if (window.AudioContext) {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
