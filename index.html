@@ -264,104 +264,90 @@
         </div>
     </div>
 
+    <!-- Load comprehensive question database -->
+    <script src="data/questions.js"></script>
+
     <script>
-        // Quiz data
-        const quizData = {
-            science: [
-                {
-                    question: "What is the chemical symbol for water?",
-                    options: ["H2O", "CO2", "O2", "H2SO4"],
-                    correct: 0,
-                    explanation: "Water is H2O - two hydrogen atoms and one oxygen atom."
-                },
-                {
-                    question: "Which planet is known as the Red Planet?",
-                    options: ["Venus", "Mars", "Jupiter", "Saturn"],
-                    correct: 1,
-                    explanation: "Mars appears red due to iron oxide (rust) on its surface."
-                },
-                {
-                    question: "What is the speed of light in vacuum?",
-                    options: ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"],
-                    correct: 0,
-                    explanation: "Light travels at approximately 300,000 kilometers per second in vacuum."
-                },
-                {
-                    question: "What gas do plants absorb from the atmosphere during photosynthesis?",
-                    options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
-                    correct: 2,
-                    explanation: "Plants absorb carbon dioxide from the atmosphere and release oxygen during photosynthesis."
-                },
-                {
-                    question: "What is the hardest natural substance on Earth?",
-                    options: ["Gold", "Iron", "Diamond", "Quartz"],
-                    correct: 2,
-                    explanation: "Diamond is the hardest natural substance on Earth."
+        // Convert the comprehensive database to simplified format for this interface
+        let quizData = {};
+
+        if (typeof QUIZ_DATABASE !== 'undefined') {
+            // Extract all questions from all levels of each section
+            Object.keys(QUIZ_DATABASE).forEach(sectionKey => {
+                const section = QUIZ_DATABASE[sectionKey];
+                quizData[sectionKey] = [];
+
+                // Combine questions from all levels (1-10)
+                for (let level = 1; level <= 10; level++) {
+                    if (section.levels && section.levels[level]) {
+                        quizData[sectionKey] = quizData[sectionKey].concat(section.levels[level]);
+                    }
                 }
-            ],
-            history: [
-                {
-                    question: "In which year did World War II end?",
-                    options: ["1944", "1945", "1946", "1947"],
-                    correct: 1,
-                    explanation: "World War II ended in 1945 with the surrender of Japan."
-                },
-                {
-                    question: "Who was the first president of the United States?",
-                    options: ["Thomas Jefferson", "John Adams", "George Washington", "Benjamin Franklin"],
-                    correct: 2,
-                    explanation: "George Washington was the first President of the United States."
-                },
-                {
-                    question: "Which ancient wonder of the world was located in Alexandria?",
-                    options: ["Hanging Gardens", "Lighthouse", "Colossus", "Mausoleum"],
-                    correct: 1,
-                    explanation: "The Lighthouse of Alexandria was one of the Seven Wonders of the Ancient World."
-                }
-            ],
-            sports: [
-                {
-                    question: "How many players are on a basketball team on the court?",
-                    options: ["4", "5", "6", "7"],
-                    correct: 1,
-                    explanation: "Basketball teams have 5 players on the court at a time."
-                },
-                {
-                    question: "In which sport would you perform a slam dunk?",
-                    options: ["Tennis", "Basketball", "Volleyball", "Baseball"],
-                    correct: 1,
-                    explanation: "A slam dunk is a basketball move where a player jumps and scores by pushing the ball down through the hoop."
-                }
-            ],
-            literature: [
-                {
-                    question: "Who wrote 'Romeo and Juliet'?",
-                    options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
-                    correct: 1,
-                    explanation: "William Shakespeare wrote the famous tragedy 'Romeo and Juliet'."
-                },
-                {
-                    question: "Which novel begins with 'It was the best of times, it was the worst of times'?",
-                    options: ["Great Expectations", "A Tale of Two Cities", "Oliver Twist", "David Copperfield"],
-                    correct: 1,
-                    explanation: "A Tale of Two Cities by Charles Dickens begins with this famous line."
-                }
-            ],
-            general: [
-                {
-                    question: "What is the capital of Australia?",
-                    options: ["Sydney", "Melbourne", "Canberra", "Perth"],
-                    correct: 2,
-                    explanation: "Canberra is the capital city of Australia."
-                },
-                {
-                    question: "How many continents are there?",
-                    options: ["5", "6", "7", "8"],
-                    correct: 2,
-                    explanation: "There are 7 continents: Asia, Africa, North America, South America, Antarctica, Europe, and Australia."
-                }
-            ]
-        };
+
+                // Shuffle questions for variety
+                quizData[sectionKey] = shuffleArray(quizData[sectionKey]);
+            });
+
+            console.log('✅ Loaded comprehensive question database');
+            console.log(`📊 Question counts:`, Object.keys(quizData).map(key =>
+                `${key}: ${quizData[key]?.length || 0} questions`
+            ));
+        } else {
+            console.error('❌ Question database not loaded, using fallback');
+            // Fallback to basic questions if database fails to load
+            quizData = {
+                science: [
+                    {
+                        question: "What is the chemical symbol for water?",
+                        options: ["H2O", "CO2", "O2", "H2SO4"],
+                        correct: 0,
+                        explanation: "Water is H2O - two hydrogen atoms and one oxygen atom."
+                    }
+                ],
+                history: [
+                    {
+                        question: "In which year did World War II end?",
+                        options: ["1944", "1945", "1946", "1947"],
+                        correct: 1,
+                        explanation: "World War II ended in 1945 with the surrender of Japan."
+                    }
+                ],
+                sports: [
+                    {
+                        question: "How many players are on a basketball team on the court?",
+                        options: ["4", "5", "6", "7"],
+                        correct: 1,
+                        explanation: "Basketball teams have 5 players on the court at a time."
+                    }
+                ],
+                literature: [
+                    {
+                        question: "Who wrote 'Romeo and Juliet'?",
+                        options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+                        correct: 1,
+                        explanation: "William Shakespeare wrote the famous tragedy 'Romeo and Juliet'."
+                    }
+                ],
+                general: [
+                    {
+                        question: "What is the capital of Australia?",
+                        options: ["Sydney", "Melbourne", "Canberra", "Perth"],
+                        correct: 2,
+                        explanation: "Canberra is the capital city of Australia."
+                    }
+                ]
+            };
+        }
+
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
 
         // Game state
         let currentQuiz = [];
@@ -415,13 +401,21 @@
 
         // Start quiz
         function startQuiz(section) {
-            currentQuiz = [...quizData[section]];
+            if (!quizData[section] || quizData[section].length === 0) {
+                alert('No questions available for this section. Please try another section.');
+                return;
+            }
+
+            // Take first 10-15 questions from the shuffled array for a reasonable quiz length
+            const maxQuestions = Math.min(15, quizData[section].length);
+            currentQuiz = quizData[section].slice(0, maxQuestions);
             currentQuestion = 0;
             score = 0;
 
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('quiz-container').style.display = 'block';
 
+            console.log(`🎯 Starting ${section} quiz with ${currentQuiz.length} questions`);
             showQuestion();
         }
 
