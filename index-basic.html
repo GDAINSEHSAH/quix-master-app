@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Master - Ultimate Knowledge Challenge</title>
-    <link rel="stylesheet" href="css/enhanced.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -436,20 +435,6 @@
 </head>
 <body>
     <div class="main-container">
-        <!-- Top Stats Bar -->
-        <div class="top-bar">
-            <div class="stats-group">
-                <div class="stat-item" id="coins-display" onclick="UIComponents.showShop()" title="Click to open shop">💰 0</div>
-                <div class="stat-item" id="streak-display" title="Daily streak">🔥 0</div>
-                <div class="stat-item" id="level-display" onclick="UIComponents.showProfile()" title="Click to view profile">⭐ Lvl 1</div>
-            </div>
-            <div class="stats-group">
-                <button class="theme-toggle" onclick="gameSystem.toggleTheme()" title="Toggle theme">🌓</button>
-                <button class="stat-item" onclick="UIComponents.showStats()" title="View statistics">📊</button>
-                <button class="stat-item" onclick="UIComponents.showBadges()" title="View badges">🏆</button>
-            </div>
-        </div>
-
         <!-- Main Menu -->
         <div id="main-menu">
             <h1>🎓 Quiz Master</h1>
@@ -506,25 +491,6 @@
         <div id="quiz-container" class="quiz-container">
             <button class="back-btn" onclick="goHome()">← Back to Menu</button>
 
-            <!-- Power-ups Bar -->
-            <div class="powerups-bar" id="powerups-bar" style="display: none;">
-                <button class="powerup-btn" id="btn-fiftyFifty" onclick="usePowerup('fiftyFifty')" title="Remove 2 wrong answers">
-                    🎯 50/50
-                    <span class="powerup-count" id="powerup-fiftyFifty">0</span>
-                </button>
-                <button class="powerup-btn" id="btn-skip" onclick="usePowerup('skip')" title="Skip this question">
-                    ⏭️ Skip
-                    <span class="powerup-count" id="powerup-skip">0</span>
-                </button>
-                <button class="powerup-btn" id="btn-hint" onclick="usePowerup('hint')" title="Get a hint">
-                    💡 Hint
-                    <span class="powerup-count" id="powerup-hint">0</span>
-                </button>
-            </div>
-
-            <!-- Lives Display (Survival Mode) -->
-            <div class="lives-display" id="lives-display" style="display: none;"></div>
-
             <div class="score-display">
                 <div class="timer-display" id="timer-display">⏱️ 00:00</div>
                 <div class="progress-bar-container">
@@ -550,8 +516,6 @@
 
     <!-- Load comprehensive question database -->
     <script src="data/questions.js"></script>
-    <script src="js/gameSystem.js"></script>
-    <script src="js/uiComponents.js"></script>
 
     <script>
         // Utility function to shuffle array
