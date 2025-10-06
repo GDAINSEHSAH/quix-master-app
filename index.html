@@ -842,12 +842,43 @@
             currentQuiz.category = section;
             currentQuiz.level = level;
 
+            // Reset power-ups for new quiz
+            resetPowerups();
+
             document.getElementById('level-selection').style.display = 'none';
             document.getElementById('quiz-container').style.display = 'block';
 
             console.log(`🎯 Starting ${section} Level ${level} quiz with ${currentQuiz.length} questions`);
+            console.log(`🎮 Mode: ${gameSystem.currentMode}`);
             startTimer();
             showQuestion();
+        }
+
+        // Share results function
+        function shareResults(percentage, category, level) {
+            const text = `🎓 I just scored ${percentage}% on ${category.toUpperCase()} Level ${level} in Quiz Master! 🏆\n\nCan you beat my score? 💪`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Quiz Master Results',
+                    text: text,
+                    url: window.location.href
+                }).then(() => {
+                    gameSystem.showNotification('✅ Results shared!');
+                }).catch(() => {
+                    fallbackShare(text);
+                });
+            } else {
+                fallbackShare(text);
+            }
+        }
+
+        function fallbackShare(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                gameSystem.showNotification('✅ Results copied to clipboard!');
+            }).catch(() => {
+                alert(text);
+            });
         }
 
         // Show current question
@@ -948,13 +979,34 @@
             // Save score
             saveScore(currentQuiz.category, score, currentQuiz.length, elapsed, currentQuiz.level);
 
+            // Record stats
+            gameSystem.recordQuizResult(currentQuiz.category, score, currentQuiz.length, elapsed);
+
+            // Award coins and XP
+            const coinsEarned = rewardCoins(percentage, currentQuiz.level, gameSystem.currentMode);
+            const xpEarned = rewardXP(score, currentQuiz.length, currentQuiz.level);
+
+            // Check and award badges
+            const newBadges = gameSystem.checkAndAwardBadges({
+                percentage,
+                time: elapsed,
+                score,
+                total: currentQuiz.length
+            });
+
             // Check if next level should be unlocked
             const unlockedLevel = checkLevelUnlock(currentQuiz.category, currentQuiz.level, percentage);
 
             let message = `Quiz Complete! 🎉\n\nLevel: ${currentQuiz.level}\nScore: ${score}/${currentQuiz.length} (${percentage}%)\nTime: ${timeStr}`;
+            message += `\n\n💰 Earned: ${coinsEarned} coins`;
+            message += `\n⭐ Earned: ${xpEarned} XP`;
 
             if (unlockedLevel) {
                 message += `\n\n🎊 Level ${unlockedLevel} Unlocked!`;
+            }
+
+            if (newBadges.length > 0) {
+                message += `\n\n🏆 New Badge${newBadges.length > 1 ? 's' : ''}: ${newBadges.map(b => b.name).join(', ')}`;
             }
 
             if (percentage >= 90) {
@@ -976,6 +1028,9 @@
             if (percentage < 85 && currentQuiz.level < 10) {
                 message += `\n\n💡 Score 85% or higher to unlock Level ${currentQuiz.level + 1}`;
             }
+
+            // Update UI
+            gameSystem.updateUI();
 
             document.getElementById('question-text').innerHTML = message.replace(/\n/g, '<br>');
 
@@ -1000,6 +1055,9 @@
             }
 
             buttonsHtml += `
+                <button class="share-btn" onclick="shareResults(${percentage}, '${currentQuiz.category}', ${currentQuiz.level})">
+                    📤 Share Results
+                </button>
                 <button onclick="showLeaderboard()" style="margin: 10px; padding: 15px 30px; border-radius: 25px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; border: none; cursor: pointer; font-weight: bold;">
                     🏆 View Leaderboard
                 </button>
@@ -1008,6 +1066,9 @@
                 </button>
                 <button onclick="goHome()" style="margin: 10px; padding: 15px 30px; border-radius: 25px; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3); cursor: pointer;">
                     🏠 Home
+                </button>
+                <button onclick="gameSystem.exportData()" style="margin: 10px; padding: 15px 30px; border-radius: 25px; background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3); cursor: pointer;">
+                    💾 Export Progress
                 </button>
             `;
 
@@ -1137,10 +1198,87 @@
             }
         });
 
+        // Power-up functions
+        let usedPowerups = { fiftyFifty: false, skip: false, hint: false };
+
+        function usePowerup(type) {
+            if (usedPowerups[type]) {
+                gameSystem.showNotification('⚠️ Already used this power-up!');
+                return;
+            }
+
+            if (!gameSystem.usePowerup(type)) {
+                gameSystem.showNotification('❌ No power-ups left! Buy more in the shop.');
+                return;
+            }
+
+            usedPowerups[type] = true;
+
+            if (type === 'fiftyFifty') {
+                const question = currentQuiz[currentQuestion];
+                const options = document.querySelectorAll('.option-btn');
+                let removed = 0;
+                options.forEach((option, index) => {
+                    if (index !== question.correct && removed < 2) {
+                        option.style.display = 'none';
+                        removed++;
+                    }
+                });
+                gameSystem.showNotification('🎯 Removed 2 wrong answers!');
+            } else if (type === 'skip') {
+                gameSystem.showNotification('⏭️ Question skipped!');
+                nextQuestion();
+            } else if (type === 'hint') {
+                const question = currentQuiz[currentQuestion];
+                const hint = question.explanation.substring(0, 50) + '...';
+                gameSystem.showNotification('💡 Hint: ' + hint);
+            }
+        }
+
+        function resetPowerups() {
+            usedPowerups = { fiftyFifty: false, skip: false, hint: false };
+        }
+
+        // Reward coins based on performance
+        function rewardCoins(percentage, level, mode) {
+            let coins = 0;
+
+            // Base reward
+            coins += Math.round(percentage / 10); // 0-10 coins for 0-100%
+
+            // Level multiplier
+            coins += level * 2;
+
+            // Mode bonus
+            if (mode === 'survival') coins += 5;
+            if (mode === 'timeAttack') coins += 3;
+
+            // Perfect bonus
+            if (percentage === 100) coins += 20;
+
+            gameSystem.addCoins(coins);
+            return coins;
+        }
+
+        // Calculate XP reward
+        function rewardXP(correct, total, level) {
+            const xp = (correct * 10) + (level * 5);
+            gameSystem.addXP(xp);
+            return xp;
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initAudio();
             initializeUnlockedLevels();
+
+            // Initialize game system
+            gameSystem.updateStreak();
+            gameSystem.updateUI();
+            gameSystem.applyTheme();
+
+            // Show power-ups bar
+            document.getElementById('powerups-bar').style.display = 'flex';
 
             // Enable audio on first user interaction
             document.addEventListener('click', function() {
@@ -1155,6 +1293,8 @@
             console.log('  Enter: Next question');
             console.log('  Escape: Exit quiz');
             console.log('🔓 Unlocked Levels:', unlockedLevels);
+            console.log('💰 Coins:', gameSystem.coins);
+            console.log('🎮 Game System loaded!');
         });
     </script>
 </body>
