@@ -1,0 +1,38 @@
+# Test and debug files
+*test*.html
+*test*.js
+*debug*.html
+*debug*.js
+diagnostic.html
+comparison*.html
+duplicate*.html
+error-check.html
+gameplay-test.html
+live-*.html
+live-*.js
+performance-test.js
+question-analyzer.html
+score-*.html
+simple-working.html
+sound-debug.html
+validate-database.js
+
+# Documentation (optional - keeping README.md)
+FIX-SUMMARY.md
+TEST-REPORT.md
+PUSH_TO_GITHUB.md
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if added later)
+node_modules/
+package-lock.json

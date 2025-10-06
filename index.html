@@ -488,9 +488,9 @@
             </div>
 
             <div class="controls" id="main-controls">
-                <button onclick="testSound()">🔊 Test Sound</button>
-                <button onclick="showLeaderboard(); document.getElementById('main-menu').style.display='none'; document.getElementById('quiz-container').style.display='block';">🏆 Leaderboard</button>
-                <button onclick="showInfo()">ℹ️ About</button>
+                <button onclick="showInfo()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                    ℹ️ How to Play
+                </button>
             </div>
         </div>
 
@@ -1165,7 +1165,65 @@
 
         // Show info
         function showInfo() {
-            alert('Quiz Master - Ultimate Knowledge Challenge\n\nTest your knowledge across 5 different categories!\n\n• Science & Technology\n• History & Geography\n• Sports & Entertainment\n• Literature & Arts\n• General Knowledge\n\n✨ Features:\n• Interactive animations & particle effects\n• Timer & progress tracking\n• Leaderboard & achievements\n• Keyboard shortcuts (1-4, Enter, Esc)\n• Sound effects\n\nKeyboard Shortcuts:\n• 1-4: Select answer\n• Enter: Next question\n• Esc: Exit quiz');
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+                    <h2 style="text-align: center; margin-bottom: 20px;">🎓 How to Play</h2>
+
+                    <div style="text-align: left; line-height: 1.8;">
+                        <h3 style="color: #4ade80; margin-top: 20px;">📚 Categories</h3>
+                        <p>Choose from 5 knowledge categories:</p>
+                        <ul style="margin-left: 20px;">
+                            <li>🔬 Science & Technology</li>
+                            <li>🏛️ History & Geography</li>
+                            <li>⚽ Sports & Entertainment</li>
+                            <li>📚 Literature & Arts</li>
+                            <li>🌟 General Knowledge</li>
+                        </ul>
+
+                        <h3 style="color: #4ade80; margin-top: 20px;">🎯 Levels & Progression</h3>
+                        <ul style="margin-left: 20px;">
+                            <li>Each category has 10 difficulty levels (Easy → Expert)</li>
+                            <li>Score <strong>85% or higher</strong> to unlock the next level</li>
+                            <li>Complete all 10 levels to master a category!</li>
+                        </ul>
+
+                        <h3 style="color: #4ade80; margin-top: 20px;">💰 Earn & Spend</h3>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Coins:</strong> Earned based on your score</li>
+                            <li><strong>XP:</strong> Level up your profile</li>
+                            <li><strong>Power-ups:</strong> Use coins to buy helpful items in the shop</li>
+                            <li><strong>Streaks:</strong> Play daily for bonus rewards</li>
+                        </ul>
+
+                        <h3 style="color: #4ade80; margin-top: 20px;">🎯 Power-ups</h3>
+                        <ul style="margin-left: 20px;">
+                            <li>🎯 <strong>50/50</strong> - Remove 2 wrong answers</li>
+                            <li>⏭️ <strong>Skip</strong> - Skip difficult questions</li>
+                            <li>💡 <strong>Hint</strong> - Get helpful clues</li>
+                        </ul>
+
+                        <h3 style="color: #4ade80; margin-top: 20px;">⌨️ Keyboard Shortcuts</h3>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>1-4:</strong> Select answer options</li>
+                            <li><strong>Enter:</strong> Go to next question</li>
+                            <li><strong>Esc:</strong> Exit current quiz</li>
+                        </ul>
+
+                        <h3 style="color: #4ade80; margin-top: 20px;">🏆 Achievements</h3>
+                        <p>Unlock badges by completing challenges and reaching milestones!</p>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button onclick="this.closest('.modal').remove()" style="padding: 12px 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1.1em;">
+                                Got it! Let's Play 🚀
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         // Keyboard shortcuts
