@@ -420,20 +420,373 @@ body.light-theme .option-btn {
     border-radius: 10px;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
+/* ============================================
+   RESPONSIVE DESIGN - MOBILE FIRST APPROACH
+   ============================================ */
+
+/* Extra Small Devices (Phones, < 576px) */
+@media (max-width: 575px) {
+    body {
+        padding: 10px;
+    }
+
+    .main-container {
+        padding: 20px 15px;
+        border-radius: 15px;
+    }
+
+    h1 {
+        font-size: 2em !important;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        font-size: 1em !important;
+        margin-bottom: 20px;
+    }
+
+    /* Top Bar */
     .top-bar {
         flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .stats-group {
+        width: 100%;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .stat-item {
+        font-size: 0.9em;
+        padding: 6px 12px;
+    }
+
+    /* Quiz Grid */
+    .quiz-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    .quiz-section {
+        padding: 20px;
+        font-size: 0.95em;
+    }
+
+    .quiz-section h3 {
+        font-size: 1.3em;
+    }
+
+    /* Levels Grid */
+    .levels-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+
+    .level-btn {
+        padding: 15px;
+        font-size: 0.9em;
+    }
+
+    /* Quiz Container */
+    .question-container h2 {
+        font-size: 1.3em !important;
+    }
+
+    .options-container {
+        gap: 12px;
+    }
+
+    .option-btn {
+        padding: 15px;
+        font-size: 0.95em;
+    }
+
+    /* Buttons */
+    .primary-btn, .secondary-btn {
+        padding: 12px 24px;
+        font-size: 1em;
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    /* Modals */
+    .modal-content {
+        padding: 20px 15px;
+        width: 95%;
+        max-height: 90vh;
+        margin: 10px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5em;
+    }
+
+    .modal-content h3 {
+        font-size: 1.2em;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-value {
+        font-size: 2em;
+    }
+
+    /* Badge Grid */
+    .badge-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+
+    .badge-icon {
+        font-size: 2em;
+    }
+
+    /* Shop Grid */
+    .shop-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    /* Avatar Grid */
+    .avatar-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px;
+    }
+
+    .avatar-option {
+        font-size: 2em;
+        padding: 10px;
+    }
+
+    /* Mode Selector */
+    .mode-selector {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+
+    /* Power-ups Bar */
+    .powerups-bar {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .powerup-btn {
+        width: 100%;
+        padding: 12px;
+    }
+
+    /* Progress and Timer */
+    .timer-display {
+        font-size: 1.2em;
+    }
+
+    /* Controls */
+    .controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .controls button {
+        width: 100%;
+    }
+}
+
+/* Small Devices (Landscape Phones, 576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .main-container {
+        padding: 30px 25px;
+    }
+
+    h1 {
+        font-size: 2.5em !important;
+    }
+
+    .quiz-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+
+    .levels-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .badge-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .avatar-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Medium Devices (Tablets, 768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .main-container {
+        padding: 35px;
+    }
+
+    .quiz-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .levels-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+
+    .badge-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .shop-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .mode-selector {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* Large Devices (Desktops, 992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .quiz-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .levels-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* Extra Large Devices (Large Desktops, >= 1200px) */
+@media (min-width: 1200px) {
+    .main-container {
+        max-width: 1200px;
+    }
+
+    .quiz-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .levels-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* Landscape Orientation Specific */
+@media (orientation: landscape) and (max-height: 500px) {
+    .main-container {
+        padding: 15px;
+        margin: 10px auto;
+    }
+
+    h1 {
+        font-size: 1.8em !important;
+        margin-bottom: 8px;
+    }
+
+    .subtitle {
+        font-size: 0.9em !important;
+        margin-bottom: 15px;
     }
 
     .modal-content {
-        padding: 20px;
-        width: 95%;
+        max-height: 85vh;
+        padding: 15px;
     }
 
-    .stats-grid,
-    .badge-grid,
-    .shop-grid {
-        grid-template-columns: 1fr;
+    .quiz-section {
+        padding: 15px;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger tap targets for touch devices */
+    .option-btn,
+    .quiz-section,
+    .level-btn,
+    .primary-btn,
+    .secondary-btn,
+    .powerup-btn {
+        min-height: 48px;
+        padding: 15px 20px;
+    }
+
+    /* Remove hover effects on touch devices */
+    .option-btn:hover,
+    .quiz-section:hover,
+    .level-btn:hover {
+        transform: none;
+    }
+
+    /* Add active states instead */
+    .option-btn:active,
+    .quiz-section:active,
+    .level-btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* High DPI Displays (Retina) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    /* Optimize for high-resolution displays */
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Dark Mode Support (System Preference) */
+@media (prefers-color-scheme: dark) {
+    /* Already using dark theme by default */
+}
+
+/* Reduced Motion Support (Accessibility) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+
+    .top-bar,
+    .controls,
+    .powerups-bar,
+    .modal {
+        display: none !important;
+    }
+
+    .main-container {
+        box-shadow: none;
+        border: 1px solid #ddd;
     }
 }
