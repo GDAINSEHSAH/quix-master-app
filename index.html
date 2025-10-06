@@ -607,6 +607,9 @@
         let currentQuiz = [];
         let currentQuestion = 0;
         let score = 0;
+        let wrongAnswers = []; // Track wrong answers for review
+        let questionStartTime = 0; // Track time per question
+        let questionTimes = []; // Store time taken per question
         let audioContext = null;
         let startTime = 0;
         let timerInterval = null;
@@ -871,6 +874,7 @@
             currentQuiz = [...sectionData.levels[level]];
             currentQuestion = 0;
             score = 0;
+            wrongAnswers = []; // Reset wrong answers tracking
             currentQuiz.category = section;
             currentQuiz.level = level;
 
@@ -982,6 +986,15 @@
                 feedback.innerHTML = `✅ Correct! ${question.explanation}`;
                 feedback.style.background = 'rgba(40, 167, 69, 0.3)';
             } else {
+                // Store wrong answer for review
+                wrongAnswers.push({
+                    questionNumber: currentQuestion + 1,
+                    question: question.question,
+                    yourAnswer: question.options[selectedIndex],
+                    correctAnswer: question.options[question.correct],
+                    explanation: question.explanation
+                });
+
                 playSound(220, 0.3); // A3
                 setTimeout(() => playSound(185, 0.3), 300); // F#3
 
@@ -1188,11 +1201,66 @@
         // Go back to home
         function goHome() {
             stopTimer();
+            wrongAnswers = []; // Reset wrong answers
             document.getElementById('main-menu').style.display = 'block';
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('level-selection').style.display = 'none';
             document.getElementById('timer-display').classList.remove('timer-warning');
             document.getElementById('progress-bar').style.width = '0%';
+        }
+
+        // Review wrong answers feature
+        function reviewWrongAnswers() {
+            if (wrongAnswers.length === 0) {
+                alert('🎉 Perfect! You got all questions correct!');
+                return;
+            }
+
+            let reviewHTML = `
+                <div style="text-align: left; max-width: 800px; margin: 0 auto;">
+                    <h2 style="text-align: center; margin-bottom: 20px;">📝 Review Wrong Answers (${wrongAnswers.length})</h2>
+            `;
+
+            wrongAnswers.forEach((item, index) => {
+                reviewHTML += `
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin: 15px 0; border-left: 4px solid #ef4444;">
+                        <h3 style="color: #fbbf24; margin-bottom: 10px;">Question ${item.questionNumber}</h3>
+                        <p style="font-size: 1.1em; margin-bottom: 15px;"><strong>${item.question}</strong></p>
+
+                        <div style="margin: 10px 0;">
+                            <span style="color: #ef4444;">❌ Your Answer:</span>
+                            <span style="background: rgba(239, 68, 68, 0.2); padding: 5px 10px; border-radius: 5px; margin-left: 10px;">${item.yourAnswer}</span>
+                        </div>
+
+                        <div style="margin: 10px 0;">
+                            <span style="color: #10b981;">✅ Correct Answer:</span>
+                            <span style="background: rgba(16, 185, 129, 0.2); padding: 5px 10px; border-radius: 5px; margin-left: 10px;">${item.correctAnswer}</span>
+                        </div>
+
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
+                            <strong style="color: #60a5fa;">💡 Explanation:</strong>
+                            <p style="margin-top: 5px;">${item.explanation}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            reviewHTML += `
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="closeReview()" style="padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1.1em;">
+                        ✓ Got It, Thanks!
+                    </button>
+                </div>
+            </div>
+            `;
+
+            document.getElementById('question-text').innerHTML = reviewHTML;
+            document.getElementById('options-container').innerHTML = '';
+        }
+
+        function closeReview() {
+            // Go back to results
+            showResults();
         }
 
         // Show info
