@@ -4,7 +4,9 @@ An interactive, feature-rich quiz application with gamification, progressive lev
 
 ## 🌟 Live Demo
 
-Open `index.html` in your browser or visit [your-github-pages-url]
+**Live URL:** Coming soon! (Enable GitHub Pages to get your live URL)
+
+**Local Testing:** Open `index.html` in your browser
 
 ## ✨ Features
 
