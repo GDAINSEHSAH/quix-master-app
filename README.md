@@ -2,11 +2,18 @@
 
 An interactive, feature-rich quiz application with gamification, progressive leveling, and comprehensive analytics.
 
+**✨ Latest Update:** Fully optimized for mobile phones in portrait mode! Perfect responsive design across all devices.
+
 ## 🌟 Live Demo
 
-**Live URL:** Coming soon! (Enable GitHub Pages to get your live URL)
+**🔴 LIVE NOW:** After enabling GitHub Pages, your app will be at:
+`https://gdainsehsah.github.io/quix-master-app/`
 
-**Local Testing:** Open `index.html` in your browser
+**📱 Mobile Optimized:** Perfect on all phones (portrait & landscape)
+
+**💻 Local Testing:** Open `index.html` in your browser
+
+**⚡ Enable GitHub Pages:** Go to Settings → Pages → Select "main" branch → Save
 
 ## ✨ Features
 
